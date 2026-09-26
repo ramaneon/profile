@@ -24,6 +24,13 @@
 'use strict';
 
 /* ════════════════════════════════════════════════════════════════
+   DEVICE DETECTION — one source of truth
+   ════════════════════════════════════════════════════════════════ */
+const IS_TOUCH  = window.matchMedia('(pointer: coarse)').matches;
+const IS_MOBILE = window.innerWidth < 768 || IS_TOUCH;
+const IS_LOW_END = IS_MOBILE && navigator.hardwareConcurrency <= 4;
+
+/* ════════════════════════════════════════════════════════════════
    LERP HELPER
    ════════════════════════════════════════════════════════════════ */
 const lerp = (a, b, t) => a + (b - a) * t;
@@ -34,7 +41,8 @@ const lerp = (a, b, t) => a + (b - a) * t;
 let lenis;
 
 function initLenis() {
-  if (!window.Lenis) return;
+  // Mobile: native scroll is GPU-accelerated — Lenis adds overhead, skip it
+  if (!window.Lenis || IS_MOBILE) return;
 
   lenis = new Lenis({
     duration:   1.3,
@@ -138,6 +146,8 @@ function initCursor() {
 function initWebGL() {
   const canvas = document.getElementById('hero-canvas');
   if (!canvas || !window.THREE) return;
+  // Skip WebGL entirely on very low-end mobile — saves ~60ms paint + GPU pressure
+  if (IS_LOW_END) { canvas.style.display = 'none'; return; }
 
   const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: false });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -148,7 +158,7 @@ function initWebGL() {
   camera.position.z = 6;
 
   /* Particle cloud */
-  const COUNT = window.innerWidth < 768 ? 700 : 1600;
+  const COUNT = IS_MOBILE ? 300 : (window.innerWidth < 1200 ? 900 : 1600);
   const pos   = new Float32Array(COUNT * 3);
   const alpha = new Float32Array(COUNT);
   const speed = new Float32Array(COUNT);
@@ -409,9 +419,10 @@ function initReveal() {
 }
 
 /* ════════════════════════════════════════════════════════════════
-   9. 3D TILT — lerp-smooth
+   9. 3D TILT — desktop only (touch devices skip entirely)
    ════════════════════════════════════════════════════════════════ */
 function initTilt() {
+  if (IS_TOUCH) return; // tilt is meaningless + janky on touch
   document.querySelectorAll('.tilt-el').forEach(card => {
     const MAX = 7;
     let tx = 0, ty = 0;   // target
@@ -454,9 +465,10 @@ function initTilt() {
 }
 
 /* ════════════════════════════════════════════════════════════════
-   10. MAGNETIC BUTTONS — lerp elastic pull
+   10. MAGNETIC BUTTONS — desktop only
    ════════════════════════════════════════════════════════════════ */
 function initMagnetic() {
+  if (IS_TOUCH) return; // magnetic pull on touch = broken UX
   document.querySelectorAll('.magnetic').forEach(btn => {
     const STRENGTH = 0.38;
     let bx = 0, by = 0;   // target offset
@@ -499,6 +511,7 @@ function initMagnetic() {
 const _av = { tx: 0, ty: 0, cx: 0, cy: 0, el: null };
 
 function initAvatarParallax() {
+  if (IS_TOUCH) return; // no mouse on touch — skip entirely
   const scene = document.getElementById('av-scene');
   if (!scene) return;
   _av.el = scene;
@@ -622,6 +635,9 @@ function initCountUp() {
    14. SCROLL PARALLAX — orbs + hero text
    ════════════════════════════════════════════════════════════════ */
 function initParallax() {
+  // Skip parallax on mobile — native scroll already smooth, extra transforms cause jank
+  if (IS_MOBILE) return;
+
   const heroName = document.querySelector('.hero-name');
   const orbs     = document.querySelectorAll('.orb');
   const badge    = document.querySelector('.hero-badge');
@@ -666,6 +682,9 @@ const _mq = { tracks: [], vel: 0, lastScroll: 0 };
 function initMarqueeVelocity() {
   _mq.tracks = Array.from(document.querySelectorAll('.marquee-inner'));
   if (!_mq.tracks.length) return;
+
+  // On mobile skip velocity tweak — animation runs clean via CSS only
+  if (IS_MOBILE) return;
 
   if (lenis) {
     lenis.on('scroll', ({ velocity }) => { _mq.vel = velocity * 60; });
