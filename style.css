@@ -236,9 +236,9 @@ body.cur-hover .cur-label { opacity: 1; }
   display: inline-flex; align-items: center; gap: .5rem;
   padding: .3rem 1rem; border-radius: var(--r-f);
   border: 1px solid var(--border2); background: rgba(255,255,255,.025);
-  /* fix #2: raised from 0.7rem (11px) to 0.75rem (~12px) */
-  font-size: 0.75rem; font-weight: 500; color: var(--tx3);
-  letter-spacing: .08em; text-transform: uppercase; width: fit-content;
+  /* fix #1/#2: use token var; drop text-transform so 28-char label stays sentence-case */
+  font-size: var(--fs-xs); font-weight: 500; color: var(--tx3);
+  letter-spacing: .06em; width: fit-content;
   margin-bottom: 1.5rem;
   opacity: 0; transform: translateY(16px);
   transition: opacity .8s var(--ease), transform .8s var(--ease);
@@ -451,7 +451,9 @@ body.cur-hover .cur-label { opacity: 1; }
 .marquee-inner span:not(.mq-dot):hover { color: var(--tx); }
 
 /* ─── SECTIONS ───────────────────────────────────────────────── */
-.sec { padding: clamp(5rem,9vw,9rem) 0; }
+/* fix #3: reduced from clamp(5rem,9vw,9rem) → clamp(3.5rem,6vw,6rem) to
+   prevent >500px false-bottom gap between hero and About section */
+.sec { padding: clamp(3.5rem,6vw,6rem) 0; }
 .container { max-width: 1280px; margin: 0 auto; padding: 0 clamp(1rem,4vw,3rem); }
 
 .sec-eyebrow {
@@ -462,7 +464,12 @@ body.cur-hover .cur-label { opacity: 1; }
   font-size: clamp(2.4rem,6vw,5.5rem); font-weight: 900;
   line-height: 1.0; letter-spacing: -.04em; margin-bottom: 3.5rem;
 }
-.outline-t { -webkit-text-stroke: 1.5px var(--tx3); color: transparent; }
+/* fix #5: thicker stroke + semi-transparent fill so outlined headings
+   ('Do Best', 'Everywhere') remain legible on dark backgrounds */
+.outline-t {
+  -webkit-text-stroke: 2px var(--tx2);
+  color: rgba(237,237,240,.08);
+}
 .dot-accent { color: var(--accent); }
 .mono-t { font-family: var(--mono); font-size: .88em; color: var(--accent2); }
 
@@ -568,13 +575,21 @@ body.cur-hover .cur-label { opacity: 1; }
   color: rgba(255,255,255,.012); font-family: var(--mono);
   pointer-events: none; user-select: none; z-index: 0;
 }
+/* fix #4: elevate bc-link from subtle underline text to a proper secondary button
+   so card CTAs are visually consistent with hero/footer button language */
 .bc-link {
-  display: inline-flex; align-items: center; gap: .35rem; margin-top: .75rem;
-  font-size: .8rem; font-weight: 600; color: var(--accent2);
-  border-bottom: 1px solid rgba(167,139,250,.3);
-  transition: border-color .2s, color .2s;
+  display: inline-flex; align-items: center; gap: .45rem; margin-top: 1rem;
+  font-size: var(--fs-xs); font-weight: 700;
+  padding: .45rem 1rem; border-radius: var(--r-f);
+  border: 1px solid rgba(167,139,250,.35); color: var(--accent2);
+  background: rgba(167,139,250,.07);
+  transition: border-color .25s, color .25s, background .25s, transform .25s var(--ease);
+  will-change: transform;
 }
-.bc-link:hover { color: var(--accent); border-color: var(--accent); }
+.bc-link:hover {
+  border-color: var(--accent); color: #fff;
+  background: rgba(167,139,250,.18); transform: translateY(-2px);
+}
 .pill-flow { display: flex; flex-wrap: wrap; gap: .5rem; }
 /* fix #13: icon consistency — pf-pill already pill-shaped; bc-chips now matches */
 .pf-pill {
