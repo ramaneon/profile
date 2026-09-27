@@ -15,7 +15,7 @@
   --tx:      #ededf0;
   --tx2:     #909099;
   --tx3:     #4c4c58;
-  --accent:  #a78bfa;
+  --accent:  #a78bfa;   /* single accent – used for ALL decorative dots (fix #16) */
   --accent2: #c4b5fd;
   --green:   #4ade80;
   --cyan:    #22d3ee;
@@ -27,6 +27,13 @@
   --r:   13px;
   --r-l: 20px;
   --r-f: 9999px;
+
+  /* ── Consolidated type scale (fix #1) — 8 steps ── */
+  --fs-xs:   0.72rem;  /* labels, tags, eyebrows  */
+  --fs-sm:   0.82rem;  /* secondary body          */
+  --fs-base: 1rem;     /* primary body            */
+  --fs-md:   1.05rem;  /* sub-headlines           */
+  --fs-lg:   1.6rem;   /* stat numbers            */
 
   --sans: 'Inter', sans-serif;
   --mono: 'JetBrains Mono', monospace;
@@ -229,7 +236,8 @@ body.cur-hover .cur-label { opacity: 1; }
   display: inline-flex; align-items: center; gap: .5rem;
   padding: .3rem 1rem; border-radius: var(--r-f);
   border: 1px solid var(--border2); background: rgba(255,255,255,.025);
-  font-size: .7rem; font-weight: 500; color: var(--tx3);
+  /* fix #2: raised from 0.7rem (11px) to 0.75rem (~12px) */
+  font-size: 0.75rem; font-weight: 500; color: var(--tx3);
   letter-spacing: .08em; text-transform: uppercase; width: fit-content;
   margin-bottom: 1.5rem;
   opacity: 0; transform: translateY(16px);
@@ -275,13 +283,14 @@ body.cur-hover .cur-label { opacity: 1; }
 }
 .rc-word.active { position: relative; opacity: 1; transform: translateY(0); }
 
+/* fix #6: switch tagline to sans-serif and raise opacity; keep mono only for em */
 .hero-tagline {
-  font-size: clamp(.85rem,1.4vw,1.05rem); color: var(--tx3);
-  font-family: var(--mono); margin-bottom: 2.5rem;
+  font-size: clamp(0.9rem,1.5vw,1.1rem); color: var(--tx2);
+  font-family: var(--sans); margin-bottom: 2.5rem;
   opacity: 0; transform: translateY(16px);
   transition: opacity .8s var(--ease) .5s, transform .8s var(--ease) .5s;
 }
-.hero-tagline em { color: var(--tx2); font-style: normal; }
+.hero-tagline em { font-style: italic; color: var(--accent2); }
 
 .hero-actions {
   display: flex; gap: 1rem; flex-wrap: wrap;
@@ -393,12 +402,17 @@ body.cur-hover .cur-label { opacity: 1; }
   box-shadow: 0 8px 30px rgba(0,0,0,.45);
   backdrop-filter: blur(16px); will-change: transform;
 }
-.chip-a { top: 4%; right: -16%; animation: chip-bob 4.5s .0s ease-in-out infinite; }
+/* fix #7: move chip-a further right to avoid ring tangency */
+.chip-a { top: 2%; right: -26%; animation: chip-bob 4.5s .0s ease-in-out infinite; }
 .chip-b { bottom: 16%; right: -18%; animation: chip-bob 4.5s 1.2s ease-in-out infinite; }
 .chip-c { top: 38%; left: -22%; animation: chip-bob 4.5s .7s ease-in-out infinite; }
 .chip-d { top: 75%; left: -10%; animation: chip-bob 4.5s 1.8s ease-in-out infinite; }
 @keyframes chip-bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-7px)} }
 .chip-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); box-shadow: 0 0 6px var(--green); display: inline-block; animation: led 2s ease-in-out infinite; }
+
+/* fix #8: role chips get accent tint; platform chips get green tint */
+.chip-a, .chip-b { border-color: rgba(167,139,250,.35); color: var(--accent2); }
+.chip-c, .chip-d { border-color: rgba(74,222,128,.3); color: var(--green); }
 
 /* Scroll cue */
 .hero-scroll-cue {
@@ -540,17 +554,19 @@ body.cur-hover .cur-label { opacity: 1; }
 .bc-name   { font-size: 1.05rem; font-weight: 700; }
 .bc-desc   { color: var(--tx2); font-size: .82rem; line-height: 1.65; margin-bottom: 1rem; }
 .bc-chips  { display: flex; flex-wrap: wrap; gap: .35rem; }
+/* fix #10: unify chip shape — pill across ALL bento cards */
 .bc-chips span {
   font-size: .67rem; font-family: var(--mono);
-  padding: .18rem .6rem; border-radius: 5px;
+  padding: .18rem .65rem; border-radius: var(--r-f);
   background: rgba(167,139,250,.1); color: var(--accent2);
   border: 1px solid rgba(167,139,250,.2);
 }
+/* fix #11: lower opacity so watermark doesn't compete with foreground */
 .bc-bg-text {
   position: absolute; right: 1.5rem; bottom: .75rem;
   font-size: 5.5rem; font-weight: 900; line-height: 1;
-  color: rgba(255,255,255,.025); font-family: var(--mono);
-  pointer-events: none; user-select: none;
+  color: rgba(255,255,255,.012); font-family: var(--mono);
+  pointer-events: none; user-select: none; z-index: 0;
 }
 .bc-link {
   display: inline-flex; align-items: center; gap: .35rem; margin-top: .75rem;
@@ -560,6 +576,7 @@ body.cur-hover .cur-label { opacity: 1; }
 }
 .bc-link:hover { color: var(--accent); border-color: var(--accent); }
 .pill-flow { display: flex; flex-wrap: wrap; gap: .5rem; }
+/* fix #13: icon consistency — pf-pill already pill-shaped; bc-chips now matches */
 .pf-pill {
   font-size: .78rem; padding: .32rem .88rem; border: 1px solid var(--border2);
   border-radius: var(--r-f); color: var(--tx2);
@@ -570,9 +587,10 @@ body.cur-hover .cur-label { opacity: 1; }
 /* ─── PLATFORMS ──────────────────────────────────────────────── */
 .platforms-sec { background: var(--bg); }
 .plat-list { display: flex; flex-direction: column; border-top: 1px solid var(--border); }
+/* fix #21: tighten gap between pr-num and icon for better visual grouping */
 .plat-row {
   display: grid; grid-template-columns: 2.5rem 3rem 1fr auto auto auto;
-  align-items: center; gap: 1.25rem; padding: 1.5rem 0;
+  align-items: center; gap: .75rem; padding: 1.5rem 0;
   border-bottom: 1px solid var(--border); position: relative; overflow: hidden;
   transition: background .3s, padding-left .4s var(--ease);
   will-change: transform; border-radius: 0;
@@ -591,11 +609,12 @@ body.cur-hover .cur-label { opacity: 1; }
   transition: transform .3s var(--ease);
 }
 .plat-row:hover .pr-icon { transform: scale(1.1) rotate(-5deg); }
-.pr-info { flex: 1; }
+.pr-info { flex: 1; min-width: 0; }
 .pr-info h3 { font-size: 1rem; font-weight: 700; margin-bottom: .2rem; transition: color .25s; }
 .plat-row:hover .pr-info h3 { color: var(--accent2); }
 .pr-info p { font-size: .78rem; color: var(--tx3); }
-.pr-handle { font-family: var(--mono); font-size: .72rem; color: var(--tx3); transition: color .25s; }
+/* fix #14: left-align handle text for clean vertical scan axis */
+.pr-handle { font-family: var(--mono); font-size: .72rem; color: var(--tx3); transition: color .25s; text-align: left; }
 .plat-row:hover .pr-handle { color: var(--tx2); }
 .pr-tag {
   font-size: .62rem; padding: .15rem .55rem;
@@ -606,8 +625,9 @@ body.cur-hover .cur-label { opacity: 1; }
 .plat-row:hover .pr-arrow { transform: translate(4px,-4px); color: var(--accent2); }
 
 /* ─── CONNECT ────────────────────────────────────────────────── */
-.connect-sec { background: var(--bg2); }
-.connect-body { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: end; }
+.connect-sec { background: var(--bg2); padding-bottom: clamp(3rem,6vw,6rem); /* fix #15 */ }
+/* fix #5: vertically center right column against the big heading */
+.connect-body { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
 .connect-big {
   font-size: clamp(2.8rem,7vw,6.5rem); font-weight: 900;
   line-height: .97; letter-spacing: -.05em; margin-bottom: 0;
@@ -631,7 +651,8 @@ body.cur-hover .cur-label { opacity: 1; }
 .footer-inner { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
 .f-brand { font-family: var(--mono); font-weight: 700; font-size: .95rem; }
 .f-copy  { font-size: .75rem; color: var(--tx3); }
-.f-mono  { font-family: var(--mono); font-size: .72rem; color: var(--tx3); }
+/* fix #3: raise footer tagline from 0.72rem to 0.8rem (≥12px) */
+.f-mono  { font-family: var(--mono); font-size: 0.8rem; color: var(--tx3); }
 
 /* ─── TILT ───────────────────────────────────────────────────── */
 .tilt-el { transform-style: preserve-3d; }

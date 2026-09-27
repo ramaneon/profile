@@ -96,8 +96,12 @@
             <span class="btn-arrow">→</span>
             <span class="btn-shine"></span>
           </a>
+          <!-- fix #19: match hero GitHub CTA style to nav-github (outlined, not ghost) so it
+               reads consistently as a secondary action rather than competing with the fill CTA -->
           <a href="https://github.com/ramaneon" target="_blank" rel="noopener"
-             class="btn-ghost magnetic" data-cursor-label="GitHub ↗" id="btn-gh">
+             class="nav-github magnetic" data-cursor-label="GitHub ↗" id="btn-gh"
+             style="border-radius:9999px;padding:.88rem 2.2rem;font-size:.9rem;">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
             View GitHub ↗
           </a>
         </div>
@@ -136,9 +140,8 @@
           <div class="av-chip chip-a"><span>🔐</span> Pentester</div>
           <div class="av-chip chip-b"><span>💻</span> Developer</div>
           <div class="av-chip chip-c"><span>🎬</span> Techivibe</div>
-          <div class="av-chip chip-d">
-            <span class="chip-dot"></span> TryHackMe
-          </div>
+          <!-- fix #8: replace chip-dot with emoji so all chips share same icon style -->
+          <div class="av-chip chip-d"><span>🧠</span> TryHackMe</div>
         </div>
       </div>
     </div>
@@ -248,6 +251,8 @@
           <div class="bc-header"><span class="bc-emoji">💻</span><span class="bc-name">Development</span></div>
           <p class="bc-desc">Tools, scripts, web apps & automation</p>
           <div class="bc-chips"><span>Python</span><span>JS</span><span>Bash</span><span>Git</span></div>
+          <!-- fix #12/#17: add CTA consistent with TryHackMe card -->
+          <a href="https://github.com/ramaneon" target="_blank" rel="noopener" class="bc-link">View Repos ↗</a>
           <div class="bc-bg-text">DEV</div>
           <div class="bc-shimmer"></div>
         </div>
@@ -256,6 +261,8 @@
           <div class="bc-glow"></div>
           <div class="bc-header"><span class="bc-emoji">🎬</span><span class="bc-name">Content</span></div>
           <p class="bc-desc">YouTube tutorials, Instagram reels, Techivibe community</p>
+          <!-- fix #12/#17: add CTA consistent with TryHackMe card -->
+          <a href="https://www.youtube.com/@Techivibe" target="_blank" rel="noopener" class="bc-link">Watch Channel ↗</a>
           <div class="bc-bg-text">CRE</div>
           <div class="bc-shimmer"></div>
         </div>
@@ -317,8 +324,11 @@
       <h2 class="sec-display g-reveal">Find Me<br/><span class="outline-t">Everywhere</span></h2>
 
       <div class="plat-list" id="plat-list">
+          <!-- fix #4 / #20: the row was rendering at opacity 0 because g-reveal never
+               got the .on class in time; set opacity explicitly so it is always visible -->
         <a href="https://github.com/ramaneon" target="_blank" rel="noopener"
-           class="plat-row tilt-el g-reveal" data-delay="0" data-cursor-label="GitHub ↗" id="pr-gh">
+           class="plat-row tilt-el g-reveal on" data-delay="0" data-cursor-label="GitHub ↗" id="pr-gh"
+           style="opacity:1;transform:none;">
           <span class="pr-num">01</span>
           <span class="pr-icon" style="background:rgba(255,255,255,.06)">
             <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
