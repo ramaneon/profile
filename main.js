@@ -9,11 +9,15 @@
 const lerp = (a, b, t) => a + (b - a) * t;
 const isTouch = window.matchMedia('(pointer: coarse)').matches;
 
-/* ─── WEB AUDIO API: CUTE RAINDROP & VIOLIN CHIME ENGINE ───── */
+/* ─── CONTINUOUS ROMANTIC PIANO & VIOLIN AMBIENT ENGINE ─────── */
 let audioCtx = null;
-let sfxEnabled = false;
+let musicPlaying = false;
+let musicSchedulerTimer = null;
+let currentChordIndex = 0;
+let nextChordTime = 0;
+let masterMusicGain = null;
 
-// Pentatonic warm notes (C Major Pentatonic: C5, D5, E5, G5, A5, C6)
+// Warm Pentatonic Scale for occasional gentle droplets
 const PENTATONIC_SCALE = [523.25, 587.33, 659.25, 783.99, 880.00, 1046.50];
 let lastHoverTime = 0;
 let lastNoteIdx = 0;
@@ -21,7 +25,12 @@ let lastNoteIdx = 0;
 function initAudio() {
   if (!audioCtx) {
     const AudioContext = window.AudioContext || window.webkitAudioContext;
-    if (AudioContext) audioCtx = new AudioContext();
+    if (AudioContext) {
+      audioCtx = new AudioContext();
+      masterMusicGain = audioCtx.createGain();
+      masterMusicGain.gain.setValueAtTime(0, audioCtx.currentTime);
+      masterMusicGain.connect(audioCtx.destination);
+    }
   }
   if (audioCtx && audioCtx.state === 'suspended') {
     audioCtx.resume();
@@ -29,105 +38,344 @@ function initAudio() {
 }
 
 /**
- * Plays a gentle, organic raindrop droplet sound.
- * Uses a soft sine wave with quick pitch modulation & exponential decay.
+ * Romantic Chord Progressions & Melodies (Cmaj7 → G → Am7 → Fmaj7)
+ * Beautiful, emotional, reminiscent of Yiruma & Studio Ghibli
  */
-function playRainDroplet(freq = null) {
-  if (!sfxEnabled || !audioCtx) return;
+const ROMANTIC_CHORDS = [
+  {
+    name: 'Cmaj7',
+    bass: 130.81, // C3
+    arpeggio: [130.81, 196.00, 246.94, 261.63, 329.63, 392.00, 493.88, 523.25], // C3, G3, B3, C4, E4, G4, B4, C5
+    violinNote: 392.00, // G4
+    violinNext: 587.33, // D5
+  },
+  {
+    name: 'G',
+    bass: 98.00, // G2
+    arpeggio: [98.00, 146.83, 196.00, 246.94, 293.66, 392.00, 440.00], // G2, D3, G3, B3, D4, G4, A4
+    violinNote: 587.33, // D5
+    violinNext: 523.25, // C5
+  },
+  {
+    name: 'Am7',
+    bass: 110.00, // A2
+    arpeggio: [110.00, 164.81, 220.00, 261.63, 329.63, 392.00, 523.25], // A2, E3, A3, C4, E4, G4, C5
+    violinNote: 523.25, // C5
+    violinNext: 440.00, // A4
+  },
+  {
+    name: 'Fmaj7',
+    bass: 87.31, // F2
+    arpeggio: [87.31, 130.81, 174.61, 220.00, 261.63, 349.23, 392.00, 440.00], // F2, C3, F3, A3, C4, F4, G4, A4
+    violinNote: 440.00, // A4
+    violinNext: 392.00, // G4
+  }
+];
+
+/**
+ * Synthesizes a soft, warm acoustic piano note
+ */
+function playPianoNote(freq, startTime, duration = 1.4, velocity = 0.035) {
+  if (!audioCtx || !masterMusicGain) return;
   try {
-    const now = audioCtx.currentTime;
-    const baseFreq = freq || PENTATONIC_SCALE[Math.floor(Math.random() * PENTATONIC_SCALE.length)];
+    const oscFund = audioCtx.createOscillator();
+    const oscHarm = audioCtx.createOscillator();
+    const noteGain = audioCtx.createGain();
+    const noteFilter = audioCtx.createBiquadFilter();
 
-    // Primary Droplet Oscillator
-    const osc = audioCtx.createOscillator();
-    const oscHarmonic = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    const filter = audioCtx.createBiquadFilter();
+    // Warm piano lowpass filter
+    noteFilter.type = 'lowpass';
+    noteFilter.frequency.setValueAtTime(freq * 3.2, startTime);
+    noteFilter.frequency.exponentialRampToValueAtTime(freq * 1.2, startTime + duration * 0.7);
 
-    // Warm filter to round off harsh edges
-    filter.type = 'lowpass';
-    filter.frequency.setValueAtTime(baseFreq * 2.8, now);
+    oscFund.type = 'sine';
+    oscFund.frequency.setValueAtTime(freq, startTime);
 
-    osc.type = 'sine';
-    // Gentle water drop pitch flick
-    osc.frequency.setValueAtTime(baseFreq * 1.06, now);
-    osc.frequency.exponentialRampToValueAtTime(baseFreq, now + 0.03);
-    osc.frequency.exponentialRampToValueAtTime(baseFreq * 0.98, now + 0.18);
+    // Subtle 2nd harmonic for piano string realism
+    oscHarm.type = 'triangle';
+    oscHarm.frequency.setValueAtTime(freq * 2, startTime);
 
-    // Warm overtone for violin-like acoustic pluck resonance
-    oscHarmonic.type = 'triangle';
-    oscHarmonic.frequency.setValueAtTime(baseFreq * 2, now);
+    // Soft, realistic piano envelope: 4ms attack, natural decay
+    noteGain.gain.setValueAtTime(0.0001, startTime);
+    noteGain.gain.linearRampToValueAtTime(velocity, startTime + 0.006);
+    noteGain.gain.exponentialRampToValueAtTime(velocity * 0.4, startTime + 0.25);
+    noteGain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
 
-    // Very soft volume envelope
-    gain.gain.setValueAtTime(0.001, now);
-    gain.gain.linearRampToValueAtTime(0.028, now + 0.015);
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.22);
+    oscFund.connect(noteFilter);
+    oscHarm.connect(noteFilter);
+    noteFilter.connect(noteGain);
+    noteGain.connect(masterMusicGain);
 
-    osc.connect(filter);
-    oscHarmonic.connect(filter);
-    filter.connect(gain);
-    gain.connect(audioCtx.destination);
-
-    osc.start(now);
-    oscHarmonic.start(now);
-    osc.stop(now + 0.23);
-    oscHarmonic.stop(now + 0.23);
+    oscFund.start(startTime);
+    oscHarm.start(startTime);
+    oscFund.stop(startTime + duration);
+    oscHarm.stop(startTime + duration);
   } catch (e) {
-    // audio fallback
+    // fallback
   }
 }
 
 /**
- * Plays a cute, serene 3-note melodic rain arpeggio (like a music box or gentle violin pizzicato)
+ * Synthesizes a breathing, emotional violin legato voice
  */
-function playMelodyChime() {
-  if (!sfxEnabled || !audioCtx) return;
-  // Notes: E5 (659Hz) -> G5 (784Hz) -> C6 (1046Hz)
-  const melodyNotes = [659.25, 783.99, 1046.50];
-  melodyNotes.forEach((note, idx) => {
-    setTimeout(() => {
-      playRainDroplet(note);
-    }, idx * 110);
-  });
+function playViolinVoice(freq, startTime, duration = 3.6, targetFreqNext = null) {
+  if (!audioCtx || !masterMusicGain) return;
+  try {
+    const osc1 = audioCtx.createOscillator();
+    const osc2 = audioCtx.createOscillator();
+    const lfo = audioCtx.createOscillator();
+    const lfoGain = audioCtx.createGain();
+    const violinGain = audioCtx.createGain();
+    const filter = audioCtx.createBiquadFilter();
+
+    // Soft string filter
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(1400, startTime);
+    filter.Q.setValueAtTime(2.5, startTime);
+
+    // Warm dual oscillators with slight detune
+    osc1.type = 'sawtooth';
+    osc1.frequency.setValueAtTime(freq, startTime);
+
+    osc2.type = 'triangle';
+    osc2.frequency.setValueAtTime(freq * 1.002, startTime);
+
+    // Subtle portamento glide if transition exists
+    if (targetFreqNext) {
+      osc1.frequency.linearRampToValueAtTime(targetFreqNext, startTime + duration);
+      osc2.frequency.linearRampToValueAtTime(targetFreqNext * 1.002, startTime + duration);
+    }
+
+    // 4.6Hz gentle violin vibrato LFO
+    lfo.type = 'sine';
+    lfo.frequency.setValueAtTime(4.6, startTime);
+    lfoGain.gain.setValueAtTime(freq * 0.012, startTime); // gentle vibrato depth
+    lfo.connect(lfoGain);
+    lfoGain.connect(osc1.frequency);
+    lfoGain.connect(osc2.frequency);
+
+    // Violin Bowing Envelope: slow 0.8s attack, sustained singing tone, gentle release
+    violinGain.gain.setValueAtTime(0.0001, startTime);
+    violinGain.gain.linearRampToValueAtTime(0.018, startTime + 0.8);
+    violinGain.gain.setValueAtTime(0.018, startTime + duration - 0.7);
+    violinGain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
+
+    osc1.connect(filter);
+    osc2.connect(filter);
+    filter.connect(violinGain);
+    violinGain.connect(masterMusicGain);
+
+    lfo.start(startTime);
+    osc1.start(startTime);
+    osc2.start(startTime);
+
+    lfo.stop(startTime + duration);
+    osc1.stop(startTime + duration);
+    osc2.stop(startTime + duration);
+  } catch (e) {
+    // fallback
+  }
 }
 
-// SFX Toggle with melodic confirmation
+/**
+ * Synthesizes a soft organic raindrop droplet
+ */
+function playRainDroplet(freq = null) {
+  if (!audioCtx || !masterMusicGain) return;
+  try {
+    const now = audioCtx.currentTime;
+    const baseFreq = freq || PENTATONIC_SCALE[Math.floor(Math.random() * PENTATONIC_SCALE.length)];
+
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    const filter = audioCtx.createBiquadFilter();
+
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(baseFreq * 2.5, now);
+
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(baseFreq * 1.05, now);
+    osc.frequency.exponentialRampToValueAtTime(baseFreq, now + 0.03);
+    osc.frequency.exponentialRampToValueAtTime(baseFreq * 0.98, now + 0.16);
+
+    gain.gain.setValueAtTime(0.001, now);
+    gain.gain.linearRampToValueAtTime(0.02, now + 0.012);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.2);
+
+    osc.connect(filter);
+    filter.connect(gain);
+    gain.connect(masterMusicGain);
+
+    osc.start(now);
+    osc.stop(now + 0.21);
+  } catch (e) {
+    // fallback
+  }
+}
+
+/**
+ * Continuous Romantic Music Scheduler Loop
+ * Schedules gentle piano arpeggios and soaring violin counter-melodies
+ */
+function scheduleRomanticTune() {
+  if (!musicPlaying || !audioCtx) return;
+
+  const now = audioCtx.currentTime;
+  const chordDuration = 3.8; // Duration of each emotional measure (~63 BPM)
+
+  if (nextChordTime < now + 0.2) {
+    const chord = ROMANTIC_CHORDS[currentChordIndex];
+    const measureStart = Math.max(now + 0.05, nextChordTime);
+
+    // 1. Warm Violin / Cello Legato melody line for this measure
+    playViolinVoice(chord.violinNote, measureStart, chordDuration * 0.98, chord.violinNext);
+
+    // 2. Deep Piano Bass note on beat 1
+    playPianoNote(chord.bass, measureStart, 2.8, 0.04);
+
+    // 3. Arpeggiated Piano notes flowing like rain
+    const arpCount = chord.arpeggio.length;
+    chord.arpeggio.forEach((note, idx) => {
+      const noteDelay = (idx / arpCount) * (chordDuration * 0.85);
+      const noteVel = 0.018 + (idx % 2 === 0 ? 0.008 : 0.002);
+      playPianoNote(note, measureStart + noteDelay, 1.2, noteVel);
+    });
+
+    // 4. Subtle occasional high piano rain harmonic
+    if (currentChordIndex % 2 === 0) {
+      setTimeout(() => {
+        if (musicPlaying) playRainDroplet(PENTATONIC_SCALE[Math.floor(Math.random() * PENTATONIC_SCALE.length)]);
+      }, 1400);
+    }
+
+    currentChordIndex = (currentChordIndex + 1) % ROMANTIC_CHORDS.length;
+    nextChordTime = measureStart + chordDuration;
+  }
+
+  musicSchedulerTimer = setTimeout(scheduleRomanticTune, 120);
+}
+
+/**
+ * Smoothly Starts Romantic Ambient Melody
+ */
+function startRomanticMelody() {
+  initAudio();
+  if (musicPlaying) return;
+
+  musicPlaying = true;
+  nextChordTime = audioCtx.currentTime + 0.1;
+  currentChordIndex = 0;
+
+  // Silky 1.5s fade in
+  masterMusicGain.gain.cancelScheduledValues(audioCtx.currentTime);
+  masterMusicGain.gain.setValueAtTime(masterMusicGain.gain.value, audioCtx.currentTime);
+  masterMusicGain.gain.linearRampToValueAtTime(0.7, audioCtx.currentTime + 1.5);
+
+  scheduleRomanticTune();
+  updateMusicUI(true);
+}
+
+/**
+ * Smoothly Stops Romantic Ambient Melody
+ */
+function stopRomanticMelody() {
+  if (!musicPlaying) return;
+
+  musicPlaying = false;
+  clearTimeout(musicSchedulerTimer);
+
+  if (masterMusicGain && audioCtx) {
+    // Silky 0.8s fade out
+    masterMusicGain.gain.cancelScheduledValues(audioCtx.currentTime);
+    masterMusicGain.gain.setValueAtTime(masterMusicGain.gain.value, audioCtx.currentTime);
+    masterMusicGain.gain.linearRampToValueAtTime(0.0001, audioCtx.currentTime + 0.8);
+  }
+
+  updateMusicUI(false);
+}
+
+/**
+ * Synchronizes header toggle and hero widget UI states
+ */
+function updateMusicUI(isPlaying) {
+  const headerBtn = document.getElementById('sfx-toggle');
+  const headerStatus = document.getElementById('music-pill-status');
+  const heroWidget = document.getElementById('hero-music-widget');
+  const heroChip = document.getElementById('hero-music-chip');
+  const heroSub = document.getElementById('hero-music-sub');
+
+  if (headerBtn) {
+    headerBtn.classList.toggle('playing', isPlaying);
+  }
+  if (headerStatus) {
+    headerStatus.textContent = isPlaying ? 'Melody: Playing ♫' : 'Melody: Off';
+  }
+
+  if (heroWidget) {
+    heroWidget.classList.toggle('playing', isPlaying);
+  }
+  if (heroChip) {
+    heroChip.textContent = isPlaying ? 'Playing ♫' : 'Play ♫';
+  }
+  if (heroSub) {
+    heroSub.textContent = isPlaying ? 'Continuous romantic piano & violin · Playing' : 'Gentle rain texture · Click to listen';
+  }
+}
+
+// Header Music Toggle Button
 const sfxToggleBtn = document.getElementById('sfx-toggle');
 if (sfxToggleBtn) {
-  sfxToggleBtn.addEventListener('click', () => {
-    initAudio();
-    sfxEnabled = !sfxEnabled;
-    sfxToggleBtn.style.color = sfxEnabled ? '#fbbf24' : '';
-    sfxToggleBtn.style.borderColor = sfxEnabled ? 'rgba(251, 191, 36, 0.4)' : '';
-    sfxToggleBtn.style.background = sfxEnabled ? 'rgba(251, 191, 36, 0.1)' : '';
-    if (sfxEnabled) {
-      playMelodyChime();
+  sfxToggleBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (musicPlaying) {
+      stopRomanticMelody();
+    } else {
+      startRomanticMelody();
     }
   });
 }
 
-// Selective & throttled sound triggers:
-// ONLY primary buttons and main nav links, with at least 850ms cooldown so it never spams
-const KEY_SOUND_TARGETS = '.primary-btn, .launch-btn, .nav-link, .pill-btn, .copy-email-btn';
+// Hero Music Widget Click Handler
+const heroMusicWidget = document.getElementById('hero-music-widget');
+if (heroMusicWidget) {
+  heroMusicWidget.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (musicPlaying) {
+      stopRomanticMelody();
+    } else {
+      startRomanticMelody();
+    }
+  });
+}
 
+// Selective & throttled hover sounds (gentle raindrop)
+const KEY_SOUND_TARGETS = '.primary-btn, .launch-btn, .nav-link, .pill-btn, .copy-email-btn';
 document.querySelectorAll(KEY_SOUND_TARGETS).forEach(el => {
   el.addEventListener('mouseenter', () => {
     const now = Date.now();
-    // 850ms throttle so it only plays occasional, gentle droplets
+    // 850ms cooldown so it stays soothing and occasional
     if (now - lastHoverTime > 850) {
       lastHoverTime = now;
       lastNoteIdx = (lastNoteIdx + 1) % PENTATONIC_SCALE.length;
-      playRainDroplet(PENTATONIC_SCALE[lastNoteIdx]);
-    }
-  });
-
-  el.addEventListener('click', () => {
-    initAudio();
-    if (sfxEnabled) {
-      playMelodyChime();
+      if (musicPlaying) {
+        playRainDroplet(PENTATONIC_SCALE[lastNoteIdx]);
+      }
     }
   });
 });
+
+// Auto-start prompt on first visitor interaction (compliant with browser autoplay policy)
+function handleFirstVisitorInteraction() {
+  if (!musicPlaying) {
+    startRomanticMelody();
+  }
+  window.removeEventListener('click', handleFirstVisitorInteraction);
+  window.removeEventListener('keydown', handleFirstVisitorInteraction);
+}
+
+// Listen for first interaction to smoothly start the romantic tune
+window.addEventListener('click', handleFirstVisitorInteraction, { once: true });
+window.addEventListener('keydown', handleFirstVisitorInteraction, { once: true });
 
 /* ─── THREE.JS 3D WEBGL AMBIENT BACKGROUND ──────────────────── */
 function initThreeWebGL() {

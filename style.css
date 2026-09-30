@@ -391,6 +391,71 @@ img {
   transform: translateY(-1px);
 }
 
+/* Romantic Ambient Music Pill Toggle */
+.music-pill-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  background: var(--bg-pill);
+  border: 1px solid var(--border-glass);
+  color: var(--tx-muted);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s var(--ease-smooth);
+}
+
+.music-pill-toggle:hover {
+  color: var(--accent-gold);
+  border-color: var(--accent-border);
+  background: var(--accent-soft-bg);
+  transform: translateY(-1px);
+}
+
+.music-pill-toggle.playing {
+  color: #0b0b0e;
+  background: var(--accent-gold);
+  border-color: var(--accent-gold);
+  box-shadow: 0 4px 16px rgba(251, 191, 36, 0.4);
+}
+
+.music-icon-note {
+  font-size: 14px;
+  line-height: 1;
+}
+
+.mini-eq {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 10px;
+}
+
+.mini-eq span {
+  width: 2px;
+  height: 3px;
+  background: currentColor;
+  border-radius: 1px;
+  transition: height 0.2s;
+}
+
+.music-pill-toggle.playing .mini-eq span:nth-child(1) {
+  animation: eq-mini 0.8s infinite ease-in-out;
+}
+.music-pill-toggle.playing .mini-eq span:nth-child(2) {
+  animation: eq-mini 0.8s infinite ease-in-out 0.2s;
+}
+.music-pill-toggle.playing .mini-eq span:nth-child(3) {
+  animation: eq-mini 0.8s infinite ease-in-out 0.4s;
+}
+
+@keyframes eq-mini {
+  0%, 100% { height: 3px; }
+  50% { height: 10px; }
+}
+
 /* Avatar Disc with Orbit */
 .avatar-chip-wrap {
   position: relative;
@@ -953,6 +1018,17 @@ img {
   display: flex;
   align-items: center;
   gap: 12px;
+  transition: all 0.25s var(--ease-smooth);
+}
+
+.music-telemetry-widget.clickable-widget {
+  cursor: pointer;
+}
+
+.music-telemetry-widget.clickable-widget:hover {
+  background: rgba(251, 191, 36, 0.06);
+  border-color: var(--accent-border);
+  transform: translateY(-2px);
 }
 
 .widget-icon {
@@ -975,19 +1051,24 @@ img {
 
 .wave-bars span {
   width: 2.5px;
-  background: var(--accent-green);
+  height: 3px;
+  background: var(--tx-subtle);
   border-radius: 1px;
-  animation: wave 1.2s infinite ease-in-out;
+  transition: height 0.3s, background 0.3s;
 }
 
-.wave-bars span:nth-child(1) { height: 40%; animation-delay: 0.1s; }
-.wave-bars span:nth-child(2) { height: 90%; animation-delay: 0.3s; }
-.wave-bars span:nth-child(3) { height: 60%; animation-delay: 0.2s; }
-.wave-bars span:nth-child(4) { height: 80%; animation-delay: 0.4s; }
+.music-telemetry-widget.playing .wave-bars span {
+  background: var(--accent-gold);
+}
+
+.music-telemetry-widget.playing .wave-bars span:nth-child(1) { animation: wave 1.2s infinite ease-in-out; }
+.music-telemetry-widget.playing .wave-bars span:nth-child(2) { animation: wave 1.2s infinite ease-in-out 0.25s; }
+.music-telemetry-widget.playing .wave-bars span:nth-child(3) { animation: wave 1.2s infinite ease-in-out 0.15s; }
+.music-telemetry-widget.playing .wave-bars span:nth-child(4) { animation: wave 1.2s infinite ease-in-out 0.35s; }
 
 @keyframes wave {
-  0%, 100% { transform: scaleY(0.3); }
-  50% { transform: scaleY(1); }
+  0%, 100% { height: 4px; }
+  50% { height: 14px; }
 }
 
 .widget-text {
@@ -1012,10 +1093,17 @@ img {
 .widget-chip {
   font-size: 9px;
   font-weight: 700;
-  color: var(--accent-green);
-  background: rgba(34, 197, 94, 0.1);
-  padding: 2px 7px;
+  color: var(--accent-gold);
+  background: var(--accent-soft-bg);
+  border: 1px solid var(--accent-border);
+  padding: 3px 8px;
   border-radius: var(--radius-pill);
+  transition: all 0.2s;
+}
+
+.music-telemetry-widget.playing .widget-chip {
+  color: #0b0b0e;
+  background: var(--accent-gold);
 }
 
 /* ─── SMOOTH DIVIDERS ────────────────────────────────────────── */

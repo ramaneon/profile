@@ -81,9 +81,13 @@
           </div>
         </div>
 
-        <!-- Sound FX Button -->
-        <button class="icon-pill-btn" id="sfx-toggle" title="Toggle Sound Feedback" aria-label="Toggle Sound" data-cursor="Audio">
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg>
+        <!-- Romantic Ambient Piano & Violin Audio Toggle -->
+        <button class="music-pill-toggle" id="sfx-toggle" title="Play Romantic Piano & Violin Ambient Tune" aria-label="Toggle Romantic Music" data-cursor="Music">
+          <span class="music-icon-note">♫</span>
+          <span class="music-pill-text" id="music-pill-status">Melody: Off</span>
+          <div class="mini-eq" id="header-mini-eq">
+            <span></span><span></span><span></span>
+          </div>
         </button>
 
         <!-- GitHub Fast Link -->
@@ -247,18 +251,18 @@
               </div>
             </div>
 
-            <!-- Playing / Live Telemetry Widget -->
-            <div class="music-telemetry-widget">
+            <!-- Playing / Romantic Ambient Tune Widget -->
+            <div class="music-telemetry-widget clickable-widget" id="hero-music-widget" title="Click to play / pause romantic ambient tune" data-cursor="Play Music">
               <div class="widget-icon">
-                <div class="wave-bars">
+                <div class="wave-bars" id="hero-wave-bars">
                   <span></span><span></span><span></span><span></span>
                 </div>
               </div>
               <div class="widget-text">
-                <div class="widget-title">Deep Focus · Lo-Fi Synthwaves</div>
-                <div class="widget-sub">System running smoothly · 144 FPS WebGL</div>
+                <div class="widget-title" id="hero-music-title">Romantic Melody · Piano &amp; Violin</div>
+                <div class="widget-sub" id="hero-music-sub">Gentle rain texture · Click to listen</div>
               </div>
-              <div class="widget-chip">Live</div>
+              <div class="widget-chip" id="hero-music-chip">Play ♫</div>
             </div>
 
           </div>
