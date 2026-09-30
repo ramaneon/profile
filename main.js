@@ -1,25 +1,15 @@
 /**
- * main.js — RAMANEON Cyberpunk & Gamer HUD Portfolio
+ * main.js — Raman Kumar (ramaneon)
+ * Silky Smooth, Human & Interactive System
  * ─────────────────────────────────────────────────────────────
- * FEATURES:
- *  ✓ Three.js 3D WebGL cyber core (wireframe icosahedron + particle constellation)
- *  ✓ Dynamic cursor with hover labels & smooth lerp
- *  ✓ Web Audio API synthesized cyberpunk audio SFX
- *  ✓ Typewriter / role cycler
- *  ✓ 3D tilt cards with specular reflections
- *  ✓ Interactive CLI Terminal with custom commands & matrix effect
- *  ✓ Project filter tabs (Security, AI, Tools)
- *  ✓ Scroll progress tracker
- *  ✓ Mobile navigation drawer
  */
 
 'use strict';
 
-/* ─── GLOBAL UTILITIES ───────────────────────────────────────── */
 const lerp = (a, b, t) => a + (b - a) * t;
 const isTouch = window.matchMedia('(pointer: coarse)').matches;
 
-/* ─── WEB AUDIO API CYBER SFX ────────────────────────────────── */
+/* ─── WEB AUDIO API CYBER SFX (GENTLE & SOFT) ───────────────── */
 let audioCtx = null;
 let sfxEnabled = false;
 
@@ -33,16 +23,16 @@ function initAudio() {
   }
 }
 
-function playCyberBeep(freq = 880, duration = 0.08, type = 'sine') {
+function playSoftBeep(freq = 640, duration = 0.06) {
   if (!sfxEnabled || !audioCtx) return;
   try {
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
-    osc.type = type;
+    osc.type = 'sine';
     osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(freq * 1.5, audioCtx.currentTime + duration);
+    osc.frequency.exponentialRampToValueAtTime(freq * 1.2, audioCtx.currentTime + duration);
 
-    gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+    gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
     gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
 
     osc.connect(gain);
@@ -51,96 +41,95 @@ function playCyberBeep(freq = 880, duration = 0.08, type = 'sine') {
     osc.start();
     osc.stop(audioCtx.currentTime + duration);
   } catch (e) {
-    // audio fallback silent
+    // silent fallback
   }
 }
 
-// SFX Toggle Handler
+// SFX Toggle
 const sfxToggleBtn = document.getElementById('sfx-toggle');
 if (sfxToggleBtn) {
   sfxToggleBtn.addEventListener('click', () => {
     initAudio();
     sfxEnabled = !sfxEnabled;
-    sfxToggleBtn.style.color = sfxEnabled ? '#facc15' : '';
-    sfxToggleBtn.style.borderColor = sfxEnabled ? 'rgba(250, 204, 21, 0.4)' : '';
-    if (sfxEnabled) playCyberBeep(1200, 0.15, 'triangle');
+    sfxToggleBtn.style.color = sfxEnabled ? '#fbbf24' : '';
+    sfxToggleBtn.style.borderColor = sfxEnabled ? 'rgba(251, 191, 36, 0.4)' : '';
+    if (sfxEnabled) playSoftBeep(880, 0.08);
   });
 }
 
-// Trigger sound on any interactable elements if enabled
 document.querySelectorAll('a, button, .tilt-card').forEach(el => {
   el.addEventListener('mouseenter', () => {
-    if (sfxEnabled) playCyberBeep(950, 0.05, 'sine');
+    if (sfxEnabled) playSoftBeep(720, 0.04);
   });
   el.addEventListener('click', () => {
     initAudio();
-    if (sfxEnabled) playCyberBeep(1400, 0.08, 'triangle');
+    if (sfxEnabled) playSoftBeep(960, 0.06);
   });
 });
 
-/* ─── THREE.JS 3D WEBGL INTERACTIVE CANVAS ───────────────────── */
+/* ─── THREE.JS 3D WEBGL AMBIENT BACKGROUND ──────────────────── */
 function initThreeWebGL() {
   const canvas = document.getElementById('bg-webgl-canvas');
   if (!canvas || !window.THREE) return;
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-  camera.position.z = 35;
+  camera.position.z = 32;
 
   const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-  // 1. Central 3D Cyber Wireframe Icosahedron
-  const icoGeo = new THREE.IcosahedronGeometry(9, 1);
-  const icoMat = new THREE.MeshBasicMaterial({
-    color: 0xfacc15,
+  // 1. Floating Outer Geometric Wireframe (Soft Amber)
+  const outerGeo = new THREE.IcosahedronGeometry(8, 1);
+  const outerMat = new THREE.MeshBasicMaterial({
+    color: 0xfbbf24,
     wireframe: true,
     transparent: true,
-    opacity: 0.28,
+    opacity: 0.18,
   });
-  const cyberIco = new THREE.Mesh(icoGeo, icoMat);
-  scene.add(cyberIco);
+  const outerMesh = new THREE.Mesh(outerGeo, outerMat);
+  scene.add(outerMesh);
 
-  // Inner Core Glowing Mesh
-  const coreGeo = new THREE.OctahedronGeometry(4.5, 0);
+  // 2. Inner Glowing Core (Cyan Accent)
+  const coreGeo = new THREE.OctahedronGeometry(4, 0);
   const coreMat = new THREE.MeshBasicMaterial({
-    color: 0x00f0ff,
+    color: 0x38bdf8,
     wireframe: true,
     transparent: true,
-    opacity: 0.45,
+    opacity: 0.32,
   });
-  const cyberCore = new THREE.Mesh(coreGeo, coreMat);
-  scene.add(cyberCore);
+  const coreMesh = new THREE.Mesh(coreGeo, coreMat);
+  scene.add(coreMesh);
 
-  // 2. Surrounding Cyber Orbital Ring
-  const torusGeo = new THREE.TorusGeometry(16, 0.08, 16, 100);
-  const torusMat = new THREE.MeshBasicMaterial({
-    color: 0xfacc15,
+  // 3. Delicate Ambient Orbiting Ring
+  const ringGeo = new THREE.TorusGeometry(14, 0.05, 16, 100);
+  const ringMat = new THREE.MeshBasicMaterial({
+    color: 0xfbbf24,
     transparent: true,
-    opacity: 0.22,
+    opacity: 0.15,
   });
-  const torusRing = new THREE.Mesh(torusGeo, torusMat);
-  torusRing.rotation.x = Math.PI / 3;
-  scene.add(torusRing);
+  const orbitRing = new THREE.Mesh(ringGeo, ringMat);
+  orbitRing.rotation.x = Math.PI / 3;
+  scene.add(orbitRing);
 
-  // 3. Cyber Particles Nebula
-  const particleCount = 900;
+  // 4. Stardust Particle System
+  const particleCount = 700;
   const particleGeo = new THREE.BufferGeometry();
   const positions = new Float32Array(particleCount * 3);
   const colors = new Float32Array(particleCount * 3);
 
-  const colorYellow = new THREE.Color(0xfacc15);
-  const colorCyan = new THREE.Color(0x00f0ff);
-  const colorWhite = new THREE.Color(0xffffff);
+  const colGold = new THREE.Color(0xfbbf24);
+  const colCyan = new THREE.Color(0x38bdf8);
+  const colWhite = new THREE.Color(0xffffff);
 
   for (let i = 0; i < particleCount * 3; i += 3) {
-    positions[i] = (Math.random() - 0.5) * 90;
-    positions[i + 1] = (Math.random() - 0.5) * 90;
-    positions[i + 2] = (Math.random() - 0.5) * 70;
+    positions[i] = (Math.random() - 0.5) * 80;
+    positions[i + 1] = (Math.random() - 0.5) * 80;
+    positions[i + 2] = (Math.random() - 0.5) * 60;
 
     const r = Math.random();
-    const c = r > 0.6 ? colorYellow : r > 0.2 ? colorCyan : colorWhite;
+    const c = r > 0.65 ? colGold : r > 0.3 ? colCyan : colWhite;
     colors[i] = c.r;
     colors[i + 1] = c.g;
     colors[i + 2] = c.b;
@@ -150,54 +139,50 @@ function initThreeWebGL() {
   particleGeo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
   const particleMat = new THREE.PointsMaterial({
-    size: 0.5,
+    size: 0.45,
     vertexColors: true,
     transparent: true,
-    opacity: 0.65,
+    opacity: 0.5,
   });
 
-  const particleSystem = new THREE.Points(particleGeo, particleMat);
-  scene.add(particleSystem);
+  const particles = new THREE.Points(particleGeo, particleMat);
+  scene.add(particles);
 
-  // Mouse reaction
-  let targetX = 0;
-  let targetY = 0;
-  let mouseX = 0;
-  let mouseY = 0;
+  // Smooth mouse tilt
+  let targetX = 0, targetY = 0;
+  let mouseX = 0, mouseY = 0;
 
   window.addEventListener('mousemove', (e) => {
     mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
     mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
   });
 
-  // Render loop
   function animate() {
     requestAnimationFrame(animate);
 
-    targetX = lerp(targetX, mouseX, 0.05);
-    targetY = lerp(targetY, mouseY, 0.05);
+    targetX = lerp(targetX, mouseX, 0.04);
+    targetY = lerp(targetY, mouseY, 0.04);
 
-    cyberIco.rotation.x += 0.003;
-    cyberIco.rotation.y += 0.005;
+    outerMesh.rotation.x += 0.002;
+    outerMesh.rotation.y += 0.003;
 
-    cyberCore.rotation.x -= 0.006;
-    cyberCore.rotation.y -= 0.004;
+    coreMesh.rotation.x -= 0.004;
+    coreMesh.rotation.y -= 0.003;
 
-    torusRing.rotation.z += 0.002;
-    torusRing.rotation.x = Math.PI / 3 + targetY * 0.4;
-    torusRing.rotation.y = targetX * 0.4;
+    orbitRing.rotation.z += 0.0015;
+    orbitRing.rotation.x = Math.PI / 3 + targetY * 0.3;
+    orbitRing.rotation.y = targetX * 0.3;
 
-    particleSystem.rotation.y += 0.0008;
+    particles.rotation.y += 0.0006;
 
-    scene.rotation.y = targetX * 0.35;
-    scene.rotation.x = -targetY * 0.25;
+    scene.rotation.y = targetX * 0.25;
+    scene.rotation.x = -targetY * 0.18;
 
     renderer.render(scene, camera);
   }
 
   animate();
 
-  // Resize handler
   window.addEventListener('resize', () => {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
@@ -205,7 +190,7 @@ function initThreeWebGL() {
   });
 }
 
-/* ─── HUD CURSOR LOGIC ───────────────────────────────────────── */
+/* ─── SMOOTH CURSOR ──────────────────────────────────────────── */
 function initCursor() {
   if (isTouch) return;
 
@@ -224,15 +209,14 @@ function initCursor() {
   });
 
   function renderRing() {
-    ringX = lerp(ringX, mouseX, 0.18);
-    ringY = lerp(ringY, mouseY, 0.18);
+    ringX = lerp(ringX, mouseX, 0.2);
+    ringY = lerp(ringY, mouseY, 0.2);
     ring.style.transform = `translate(${ringX - 16}px, ${ringY - 16}px)`;
-    label.style.transform = `translate(${ringX + 18}px, ${ringY + 14}px)`;
+    label.style.transform = `translate(${ringX + 16}px, ${ringY + 12}px)`;
     requestAnimationFrame(renderRing);
   }
   renderRing();
 
-  // Hover target data-cursor labels
   document.querySelectorAll('[data-cursor]').forEach(item => {
     item.addEventListener('mouseenter', () => {
       const txt = item.getAttribute('data-cursor');
@@ -249,53 +233,53 @@ function initCursor() {
   });
 }
 
-/* ─── HERO ROLE CYCLER ───────────────────────────────────────── */
+/* ─── ROLE TYPEWRITER / CYCLER ───────────────────────────────── */
 function initRoleCycler() {
-  const el = document.getElementById('cycler-text');
+  const el = document.getElementById('role-cycler');
   if (!el) return;
 
   const roles = [
-    'Security Researcher',
-    'Full-Stack Developer',
-    'APK Decompiler & Auditor',
-    'Autonomous AI Architect',
-    'Creator @Techivibe'
+    'Security Research',
+    'Full-Stack Development',
+    'Android APK Audits',
+    'Autonomous AI Systems',
+    'Tech Content Creation'
   ];
 
   let currentIdx = 0;
   let charIdx = 0;
   let isDeleting = false;
-  let typingSpeed = 90;
+  let typingSpeed = 80;
 
-  function typeTick() {
+  function tick() {
     const currentWord = roles[currentIdx];
 
     if (isDeleting) {
       el.textContent = currentWord.substring(0, charIdx - 1);
       charIdx--;
-      typingSpeed = 40;
+      typingSpeed = 35;
     } else {
       el.textContent = currentWord.substring(0, charIdx + 1);
       charIdx++;
-      typingSpeed = 90;
+      typingSpeed = 75;
     }
 
     if (!isDeleting && charIdx === currentWord.length) {
       isDeleting = true;
-      typingSpeed = 1600; // Pause at end of word
+      typingSpeed = 1800; // Pause at word completion
     } else if (isDeleting && charIdx === 0) {
       isDeleting = false;
       currentIdx = (currentIdx + 1) % roles.length;
-      typingSpeed = 400; // Pause before typing new word
+      typingSpeed = 400; // Pause before typing next word
     }
 
-    setTimeout(typeTick, typingSpeed);
+    setTimeout(tick, typingSpeed);
   }
 
-  typeTick();
+  tick();
 }
 
-/* ─── 3D TILT EFFECT ON CARDS ────────────────────────────────── */
+/* ─── 3D TILT EFFECT ─────────────────────────────────────────── */
 function init3DTilt() {
   if (isTouch) return;
 
@@ -308,19 +292,19 @@ function init3DTilt() {
       const centerX = rect.width / 2;
       const centerY = rect.height / 2;
 
-      const rotateX = ((y - centerY) / centerY) * -7;
-      const rotateY = ((x - centerX) / centerX) * 7;
+      const rotateX = ((y - centerY) / centerY) * -5;
+      const rotateY = ((x - centerX) / centerX) * 5;
 
-      card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+      card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-4px)`;
     });
 
     card.addEventListener('mouseleave', () => {
-      card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+      card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0)';
     });
   });
 }
 
-/* ─── SCROLL PROGRESS TRACKER ────────────────────────────────── */
+/* ─── SCROLL TRACKER ─────────────────────────────────────────── */
 function initScrollTracker() {
   const tracker = document.getElementById('scroll-tracker');
   if (!tracker) return;
@@ -335,8 +319,8 @@ function initScrollTracker() {
 
 /* ─── PROJECT FILTER TABS ────────────────────────────────────── */
 function initProjectFilters() {
-  const filterBtns = document.querySelectorAll('.filter-btn');
-  const projectCards = document.querySelectorAll('.projects-grid .project-card');
+  const filterBtns = document.querySelectorAll('.pill-btn');
+  const projectCards = document.querySelectorAll('.project-cards-grid .project-tile');
 
   filterBtns.forEach(btn => {
     btn.addEventListener('click', () => {
@@ -361,56 +345,45 @@ function initProjectFilters() {
 
 /* ─── INTERACTIVE BASH TERMINAL ──────────────────────────────── */
 function initTerminal() {
-  const input = document.getElementById('term-input');
-  const history = document.getElementById('term-history');
-  const body = document.getElementById('term-body');
-  if (!input || !history || !body) return;
+  const input = document.getElementById('terminal-input');
+  const logs = document.getElementById('terminal-logs');
+  const screen = document.getElementById('terminal-screen');
+  if (!input || !logs || !screen) return;
 
   const commands = {
     help: `Available commands:
-  • <span class="text-yellow">projects</span>   - View highlighted open-source tools
-  • <span class="text-yellow">skills</span>     - Inspect operator abilities & ratings
-  • <span class="text-yellow">whoami</span>     - System operator bio & coordinates
-  • <span class="text-yellow">matrix</span>     - Run real-time cypher stream
-  • <span class="text-yellow">contact</span>    - Show transmission frequencies
-  • <span class="text-yellow">streak</span>     - Check current GitHub commit streak
-  • <span class="text-yellow">clear</span>      - Clean console window
-  • <span class="text-yellow">echo [msg]</span> - Print raw argument to terminal`,
+  • <span class="text-accent">projects</span> - Highlights of featured open-source work
+  • <span class="text-accent">skills</span>   - Key abilities, stacks & tools
+  • <span class="text-accent">about</span>    - A quick overview of who I am
+  • <span class="text-accent">contact</span>  - Direct links and transmission channels
+  • <span class="text-accent">matrix</span>   - Trigger a digital stream
+  • <span class="text-accent">clear</span>    - Clear current terminal history`,
 
-    projects: `[SYSTEM::REPOSITORIES]
-  1. <a href="https://github.com/ramaneon/socneon" target="_blank" class="text-yellow">socneon</a>              - 100% client-side MITRE ATT&CK SOC analyzer
-  2. <a href="https://github.com/ramaneon/apk-decompiler" target="_blank" class="text-yellow">apk-decompiler</a>       - Android bug bounty secret & Firebase scanner
-  3. <a href="https://github.com/ramaneon/jarvisV2" target="_blank" class="text-yellow">jarvisV2</a>             - Zero-API offline autonomous PC controller
-  4. <a href="https://github.com/ramaneon/drive-analyzer" target="_blank" class="text-yellow">drive-analyzer</a>       - Browser-based storage & junk visualization
-  5. <a href="https://github.com/ramaneon/routine" target="_blank" class="text-yellow">routine</a>              - Native Kotlin Android automation package`,
+    projects: `Featured Projects:
+  1. <a href="https://github.com/ramaneon/socneon" target="_blank" class="text-accent">socneon</a>        - Client-side MITRE ATT&CK SOC analyzer
+  2. <a href="https://github.com/ramaneon/apk-decompiler" target="_blank" class="text-accent">apk-decompiler</a> - Browser-based Android secret scanner
+  3. <a href="https://github.com/ramaneon/jarvisV2" target="_blank" class="text-accent">jarvisV2</a>       - Native offline PC controller & autonomous assistant
+  4. <a href="https://github.com/ramaneon/drive-analyzer" target="_blank" class="text-accent">drive-analyzer</a> - Private local storage junk visualization
+  5. <a href="https://github.com/ramaneon/routine" target="_blank" class="text-accent">routine</a>        - Lightweight Kotlin Android utility`,
 
-    skills: `[OPERATOR::SKILL_MATRIX]
-  - Python / AsyncIO / Automation       : [PWR 96/100]
-  - C / C++ & Win32 APIs / Telemetry    : [PWR 92/100]
-  - JavaScript / TypeScript / Three.js   : [PWR 95/100]
-  - Android APK Security & Decompilation : [PWR 94/100]
-  - SOC Correlation & MITRE ATT&CK       : [PWR 90/100]
-  - Autonomous Agents & JARVIS Systems   : [PWR 93/100]`,
+    skills: `Core Tech Stack:
+  • Languages   : Python, JavaScript/TypeScript, C/C++, Kotlin, Bash
+  • Security    : Android APK Decompilation, Ghidra, Burp Suite, SOC Logs
+  • Web & UI    : React, Node.js, WebSockets, Three.js WebGL
+  • AI Systems  : Autonomous Agents, Local LLMs, OCR Pipelines`,
 
-    whoami: `Operator   : Raman Kumar (ramaneon)
-Class      : Full-Stack Security & System Architect
-Mission    : Engineering high-voltage software, breaking APK binaries, building neural agents.
-Handle     : @ramaneon (GitHub) | @Techivibe (YouTube)
-Status     : LEVEL 99 · ALL CIRCUITS LIVE`,
+    about: `Raman Kumar (ramaneon)
+Full-Stack Developer & Security Researcher.
+I enjoy building fast, private, and resilient web tools that run right in your browser.
+Creator at @Techivibe on YouTube.`,
 
-    contact: `[TRANSMISSION::FREQUENCIES]
+    contact: `Channels:
   • GitHub    : https://github.com/ramaneon
   • TryHackMe : https://tryhackme.com/p/ramaneon
   • YouTube   : https://www.youtube.com/@Techivibe
-  • LinkedIn  : https://www.linkedin.com/in/raman-kumar-036320395/
-  • Instagram : https://www.instagram.com/techivibe/`,
+  • LinkedIn  : https://www.linkedin.com/in/raman-kumar-036320395/`,
 
-    streak: `[GIT::STREAK_TELEMETRY]
-  Current Streak : 45+ days active commits
-  Total Commits  : 500+ across security, AI & web platforms
-  Status         : UNBROKEN`,
-
-    sudo: `Permission denied: operator already possesses root privileges.`,
+    matrix: `<span class="text-green">Follow the white rabbit... 01000110 01010101 01001100 01001100 00100000 01010011 01010100 01000001 01000011 01001011</span>`
   };
 
   input.addEventListener('keydown', (e) => {
@@ -419,122 +392,106 @@ Status     : LEVEL 99 · ALL CIRCUITS LIVE`,
       input.value = '';
       if (!raw) return;
 
-      const args = raw.split(' ');
-      const cmd = args[0].toLowerCase();
+      const cmd = raw.toLowerCase();
 
       if (cmd === 'clear') {
-        history.innerHTML = '';
+        logs.innerHTML = '';
         return;
       }
 
-      const block = document.createElement('div');
-      block.className = 'term-output-block';
+      const entry = document.createElement('div');
+      entry.className = 'terminal-log-entry';
 
-      let response = '';
-      if (cmd === 'matrix') {
-        response = '<span class="text-green">WAKE UP, NEO... THE MATRIX HAS YOU. 01001111 01010110 01000101 01010010 01000100 01010010 01001001 01010110 01000101</span>';
-      } else if (cmd === 'echo') {
-        response = args.slice(1).join(' ');
-      } else if (commands[cmd]) {
-        response = commands[cmd];
+      let reply = '';
+      if (commands[cmd]) {
+        reply = commands[cmd];
       } else {
-        response = `Command not recognized: '${cmd}'. Type <span class="text-yellow">help</span> for assistance.`;
+        reply = `Command '${cmd}' not recognized. Type <span class="text-accent">help</span> to view commands.`;
       }
 
-      block.innerHTML = `
-        <div class="term-out-cmd">ramaneon@core:~$ ${raw}</div>
-        <div class="term-out-resp">${response}</div>
+      entry.innerHTML = `
+        <div class="terminal-cmd-echo">guest@ramaneon:~$ ${raw}</div>
+        <div class="terminal-cmd-res">${reply}</div>
       `;
 
-      history.appendChild(block);
-      body.scrollTop = body.scrollHeight;
+      logs.appendChild(entry);
+      screen.scrollTop = screen.scrollHeight;
     }
   });
 }
 
-/* ─── COPY EMAIL DIRECT TRANSMISSION ─────────────────────────── */
+/* ─── COPY EMAIL ─────────────────────────────────────────────── */
 function initCopyEmail() {
   const btn = document.getElementById('copy-email-btn');
-  const label = document.getElementById('copy-email-label');
+  const label = document.getElementById('copy-email-text');
   if (!btn || !label) return;
 
   btn.addEventListener('click', () => {
-    const email = 'ramankumar.official@outlook.com'; // User direct contact fallback
+    const email = 'ramankumar.official@outlook.com';
     navigator.clipboard.writeText(email).then(() => {
-      const orig = label.textContent;
-      label.textContent = 'COPIED TO CLIPBOARD! [✓]';
-      label.style.color = '#facc15';
+      const original = label.textContent;
+      label.textContent = 'Copied to clipboard! ✓';
+      label.style.color = '#fbbf24';
       setTimeout(() => {
-        label.textContent = orig;
+        label.textContent = original;
         label.style.color = '';
       }, 2500);
     }).catch(() => {
-      window.location.href = 'mailto:ramankumar.official@outlook.com';
+      window.location.href = `mailto:${email}`;
     });
   });
 }
 
-/* ─── MOBILE DRAWER LOGIC ────────────────────────────────────── */
+/* ─── MOBILE DRAWER ──────────────────────────────────────────── */
 function initMobileDrawer() {
-  const burger = document.getElementById('burger-btn');
-  const drawer = document.getElementById('mobile-drawer');
-  const closeBtn = document.getElementById('close-drawer-btn');
-  const bg = document.getElementById('mobile-drawer-bg');
-  const links = document.querySelectorAll('.mn-item');
+  const toggle = document.getElementById('mobile-toggle');
+  const menu = document.getElementById('mobile-menu');
+  const close = document.getElementById('mobile-close');
+  const backdrop = document.getElementById('mobile-backdrop');
+  const links = document.querySelectorAll('.mob-link');
 
-  function open() { drawer?.classList.add('open'); }
-  function close() { drawer?.classList.remove('open'); }
+  function openMenu() {
+    menu?.classList.add('open');
+    backdrop?.classList.add('open');
+  }
 
-  burger?.addEventListener('click', open);
-  closeBtn?.addEventListener('click', close);
-  bg?.addEventListener('click', close);
+  function closeMenu() {
+    menu?.classList.remove('open');
+    backdrop?.classList.remove('open');
+  }
 
-  links.forEach(l => l.addEventListener('click', close));
+  toggle?.addEventListener('click', openMenu);
+  close?.addEventListener('click', closeMenu);
+  backdrop?.addEventListener('click', closeMenu);
+
+  links.forEach(l => l.addEventListener('click', closeMenu));
 }
 
-/* ─── GSAP SCROLL REVEALS ────────────────────────────────────── */
-function initScrollReveals() {
+/* ─── GSAP SCROLL ENHANCEMENTS ───────────────────────────────── */
+function initScrollAnimations() {
   if (window.gsap && window.ScrollTrigger) {
     gsap.registerPlugin(ScrollTrigger);
 
-    document.querySelectorAll('[data-reveal]').forEach(el => {
-      gsap.fromTo(el, 
-        { opacity: 0, y: 30 },
+    gsap.utils.toArray('.smooth-card').forEach(card => {
+      gsap.fromTo(card,
+        { opacity: 0, y: 25 },
         {
           opacity: 1,
           y: 0,
-          duration: 0.8,
+          duration: 0.7,
           ease: 'power2.out',
           scrollTrigger: {
-            trigger: el,
-            start: 'top 85%',
+            trigger: card,
+            start: 'top 88%',
             toggleActions: 'play none none none'
           }
         }
       );
     });
-  } else {
-    // Fallback IntersectionObserver
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.style.opacity = '1';
-          entry.target.style.transform = 'translateY(0)';
-          observer.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.15 });
-
-    document.querySelectorAll('[data-reveal]').forEach(el => {
-      el.style.opacity = '0';
-      el.style.transform = 'translateY(30px)';
-      el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-      observer.observe(el);
-    });
   }
 }
 
-/* ─── INITIALIZATION ON DOM READY ────────────────────────────── */
+/* ─── DOM INITIALIZATION ─────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', () => {
   initThreeWebGL();
   initCursor();
@@ -545,5 +502,5 @@ document.addEventListener('DOMContentLoaded', () => {
   initTerminal();
   initCopyEmail();
   initMobileDrawer();
-  initScrollReveals();
+  initScrollAnimations();
 });

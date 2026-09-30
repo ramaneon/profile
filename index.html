@@ -3,33 +3,30 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Raman Kumar (ramaneon) | Security Engineer & Full-Stack System Architect</title>
-  <meta name="description" content="Official portfolio of Raman Kumar (ramaneon) — Security Researcher, Full-Stack Developer, AI Agent Architect, and Creator @Techivibe. Explore tools, GitHub projects, and interactive 3D modules." />
-  <meta name="theme-color" content="#0a0a0c" />
+  <title>Raman Kumar (ramaneon) · Security Engineer & Full-Stack Developer</title>
+  <meta name="description" content="Portfolio of Raman Kumar (ramaneon) — Engineer, security researcher, and creator @Techivibe. Building tools, privacy-first software, and AI systems." />
+  <meta name="theme-color" content="#0a0a0d" />
 
   <!-- Canonical & Social Meta -->
   <link rel="canonical" href="https://ramaneon.github.io/profile/" />
-  <meta property="og:title" content="Raman Kumar (ramaneon) | Security & Full-Stack Portfolio" />
-  <meta property="og:description" content="Cyberpunk & RPG Gamer HUD Portfolio. Explore SOC Log Analyzer, APK Decompiler, JARVIS Autonomous Agents, and Security Research." />
+  <meta property="og:title" content="Raman Kumar (ramaneon) · Portfolio" />
+  <meta property="og:description" content="Full-stack developer & security researcher. Explore open-source projects, tools, and interactive 3D modules." />
   <meta property="og:url" content="https://ramaneon.github.io/profile/" />
   <meta property="og:type" content="website" />
   <meta property="og:image" content="IMG_20260517_175855_0651.jpg" />
   <meta name="twitter:card" content="summary_large_image" />
 
-  <!-- Preconnect & Fonts -->
+  <!-- Fonts: Plus Jakarta Sans + Outfit + JetBrains Mono for accents -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&family=JetBrains+Mono:ital,wght@0,300;0,400;0,600;0,700;0,800;1,400&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
 
   <!-- Stylesheet -->
   <link rel="stylesheet" href="style.css" />
 </head>
-<body class="grid-bg scanlines">
+<body class="smooth-ambient">
 
-  <!-- AUDIO SFX (synthesized Web Audio API fallback) -->
-  <audio id="sfx-beep" preload="auto"></audio>
-
-  <!-- CUSTOM HUD CURSOR -->
+  <!-- SMOOTH HUD CURSOR -->
   <div class="cursor-dot" id="cursor-dot"></div>
   <div class="cursor-ring" id="cursor-ring"></div>
   <div class="cursor-label" id="cursor-label"></div>
@@ -37,285 +34,231 @@
   <!-- SCROLL PROGRESS -->
   <div class="scroll-tracker" id="scroll-tracker"></div>
 
-  <!-- FIXED THREE.JS 3D BACKGROUND CANVAS -->
+  <!-- 3D INTERACTIVE THREE.JS WEBGL BACKGROUND -->
   <div class="canvas-3d-bg">
     <canvas id="bg-webgl-canvas"></canvas>
-    <div class="vignette-overlay"></div>
-    <div class="radial-glow glow-yellow"></div>
-    <div class="radial-glow glow-cyan"></div>
+    <div class="soft-gradient-top"></div>
+    <div class="soft-gradient-bottom"></div>
   </div>
 
-  <!-- ═══════════════════════════════════ HEADER / HUD NAV ═══════════════════════════════════ -->
-  <header class="hud-header" id="hud-header">
-    <div class="hud-header-inner">
+  <!-- ═══════════════════════════════════ HEADER ═══════════════════════════════════ -->
+  <header class="site-header" id="site-header">
+    <div class="header-inner">
       
-      <!-- Brand & Player LVL -->
-      <div class="header-left">
-        <a href="#hero" class="player-tag" data-cursor="HOME">
-          <div class="lvl-badge">
-            <span class="lvl-text">LVL 99</span>
-            <div class="live-dot pulse"></div>
-          </div>
-          <div class="player-meta">
-            <span class="player-handle">RAMANEON</span>
-            <span class="player-class">SECURITY &amp; SYSTEM ARCHITECT</span>
-          </div>
-        </a>
+      <!-- Brand & Status -->
+      <a href="#hero" class="brand-link" data-cursor="Home">
+        <div class="level-chip">
+          <span class="lvl-num">LVL 24</span>
+          <span class="status-pulse"></span>
+        </div>
+        <div class="brand-info">
+          <span class="brand-name">ramaneon</span>
+          <span class="brand-role">Security &amp; Full-Stack</span>
+        </div>
+      </a>
 
-        <!-- Desktop Navigation -->
-        <nav class="hud-nav" id="hud-nav">
-          <a href="#hero" class="nav-item active" data-cursor="HOME">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"></path><path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
-            <span>HOME</span>
-          </a>
-          <a href="#skills" class="nav-item" data-cursor="SKILLS">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-            <span>SKILLS</span>
-          </a>
-          <a href="#quests" class="nav-item" data-cursor="QUESTS">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path><rect width="20" height="14" x="2" y="6" rx="2"></rect></svg>
-            <span>QUEST_LOG</span>
-          </a>
-          <a href="#projects" class="nav-item" data-cursor="WORK">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
-            <span>PROJECTS</span>
-          </a>
-          <a href="#achievements" class="nav-item" data-cursor="AWARDS">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg>
-            <span>ACHIEVEMENTS</span>
-          </a>
-          <a href="#terminal-sec" class="nav-item" data-cursor="CLI">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
-            <span>TERMINAL</span>
-          </a>
-          <a href="#contact" class="nav-item" data-cursor="CONNECT">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-            <span>TRANSMIT</span>
-          </a>
-        </nav>
-      </div>
+      <!-- Smooth Desktop Navigation -->
+      <nav class="desktop-nav">
+        <a href="#hero" class="nav-link active" data-cursor="Top">Home</a>
+        <a href="#skills" class="nav-link" data-cursor="Skills">Skills</a>
+        <a href="#journey" class="nav-link" data-cursor="Journey">Experience</a>
+        <a href="#projects" class="nav-link" data-cursor="Work">Projects</a>
+        <a href="#highlights" class="nav-link" data-cursor="Highlights">Milestones</a>
+        <a href="#terminal-sec" class="nav-link" data-cursor="CLI">Terminal</a>
+        <a href="#contact" class="nav-link" data-cursor="Say Hello">Contact</a>
+      </nav>
 
-      <!-- Right HUD Controls -->
+      <!-- Right Action Bar -->
       <div class="header-right">
-        <!-- XP Gauge -->
-        <div class="xp-gauge-wrap">
-          <div class="xp-bar-track">
-            <div class="xp-bar-fill" style="width: 88%;"></div>
+        <!-- XP Progress Station -->
+        <div class="xp-pill-station" title="Experience Points">
+          <div class="xp-label-row">
+            <span class="xp-title">XP STATION</span>
+            <span class="xp-value">3,850 / 5,000</span>
           </div>
-          <div class="xp-labels">
-            <span class="xp-title">EXP_STATION</span>
-            <span class="xp-num">4,850 / 5,000 XP</span>
+          <div class="xp-track">
+            <div class="xp-progress-bar" style="width: 77%;"></div>
           </div>
         </div>
 
-        <div class="header-divider"></div>
-
-        <!-- 3D FX / Audio Toggle -->
-        <button class="hud-icon-btn" id="sfx-toggle" title="Toggle Cyber Audio" aria-label="Toggle Cyber Sound" data-cursor="SFX">
+        <!-- Sound FX Button -->
+        <button class="icon-pill-btn" id="sfx-toggle" title="Toggle Sound Feedback" aria-label="Toggle Sound" data-cursor="Audio">
           <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg>
         </button>
 
         <!-- GitHub Fast Link -->
-        <a href="https://github.com/ramaneon" target="_blank" rel="noopener" class="hud-icon-btn" title="GitHub Profile" data-cursor="GITHUB">
+        <a href="https://github.com/ramaneon" target="_blank" rel="noopener" class="icon-pill-btn" title="GitHub Profile" data-cursor="GitHub">
           <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
         </a>
 
-        <!-- Player Avatar with Rotating Rings & Hover Dropdown -->
-        <div class="avatar-ring-container" id="player-avatar-hud">
-          <div class="ring-spin ring-outer"></div>
-          <div class="ring-spin ring-inner"></div>
-          <div class="avatar-crop">
-            <img src="IMG_20260517_175855_0651.jpg" alt="Raman Kumar" class="hud-avatar-img" />
+        <!-- Avatar Chip with Hover Profile Card -->
+        <div class="avatar-chip-wrap" id="avatar-hover-trigger">
+          <div class="avatar-orbit"></div>
+          <div class="avatar-disc">
+            <img src="IMG_20260517_175855_0651.jpg" alt="Raman Kumar" class="avatar-photo" />
           </div>
 
-          <!-- Hover Dropdown Card -->
-          <div class="avatar-hud-dropdown">
-            <div class="hud-corner tl"></div>
-            <div class="hud-corner tr"></div>
-            <div class="hud-corner bl"></div>
-            <div class="hud-corner br"></div>
-            <div class="ahd-head">
-              <span class="ahd-title">OPERATOR_CARD</span>
-              <span class="ahd-ver">v4.2</span>
+          <!-- Hover Dropdown Profile Card -->
+          <div class="profile-popover">
+            <div class="popover-header">
+              <span class="popover-title">OPERATOR CARD</span>
+              <span class="popover-badge">ACTIVE</span>
             </div>
-            <div class="ahd-body">
-              <div class="ahd-name">RAMAN KUMAR</div>
-              <div class="ahd-status"><span class="dot-green"></span>STATUS: ARMED / READY</div>
-              <div class="ahd-stat-row">
-                <span>SECURITY LEVEL</span>
-                <span class="text-yellow">ROOT / T1</span>
-              </div>
-              <div class="ahd-stat-row">
-                <span>PROJECTS</span>
-                <span class="text-yellow">15+ SHIPPED</span>
+            <div class="popover-body">
+              <div class="popover-name">Raman Kumar</div>
+              <div class="popover-meta">Full-Stack Security Engineer</div>
+              <div class="popover-stats">
+                <div class="p-stat"><span>Experience</span><strong>2+ Years</strong></div>
+                <div class="p-stat"><span>Projects</span><strong class="text-accent">15+ Built</strong></div>
+                <div class="p-stat"><span>YouTube</span><strong>@Techivibe</strong></div>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Mobile Burger -->
-        <button class="burger-btn" id="burger-btn" aria-label="Toggle Mobile Navigation">
-          <span></span><span></span><span></span>
+        <!-- Mobile Drawer Button -->
+        <button class="mobile-toggle" id="mobile-toggle" aria-label="Open Navigation">
+          <span></span><span></span>
         </button>
 
       </div>
     </div>
-    <div class="header-scanline-light"></div>
   </header>
 
-  <!-- MOBILE MENU OVERLAY -->
-  <div class="mobile-drawer" id="mobile-drawer">
-    <div class="mobile-drawer-bg" id="mobile-drawer-bg"></div>
-    <div class="mobile-drawer-panel">
-      <div class="mobile-nav-header">
-        <span class="mono-label">// SYSTEM_NAVIGATION</span>
-        <button class="close-drawer-btn" id="close-drawer-btn">✕</button>
-      </div>
-      <nav class="mobile-nav-links">
-        <a href="#hero" class="mn-item"><span>01</span> HOME</a>
-        <a href="#skills" class="mn-item"><span>02</span> SKILL_DECK</a>
-        <a href="#quests" class="mn-item"><span>03</span> QUEST_LOG</a>
-        <a href="#projects" class="mn-item"><span>04</span> PROJECTS</a>
-        <a href="#achievements" class="mn-item"><span>05</span> ACHIEVEMENTS</a>
-        <a href="#terminal-sec" class="mn-item"><span>06</span> TERMINAL_CLI</a>
-        <a href="#contact" class="mn-item"><span>07</span> TRANSMIT</a>
-      </nav>
-      <div class="mobile-drawer-footer">
-        <div class="mdf-stat">
-          <span class="text-yellow">LVL 99</span> · RAMANEON
-        </div>
-      </div>
+  <!-- MOBILE NAVIGATION DRAWER -->
+  <div class="mobile-backdrop" id="mobile-backdrop"></div>
+  <div class="mobile-menu" id="mobile-menu">
+    <div class="mobile-menu-head">
+      <span class="menu-title">Navigation</span>
+      <button class="mobile-close" id="mobile-close">✕</button>
+    </div>
+    <nav class="mobile-links">
+      <a href="#hero" class="mob-link"><span>01</span> Home</a>
+      <a href="#skills" class="mob-link"><span>02</span> Skills</a>
+      <a href="#journey" class="mob-link"><span>03</span> Experience</a>
+      <a href="#projects" class="mob-link"><span>04</span> Projects</a>
+      <a href="#highlights" class="mob-link"><span>05</span> Milestones</a>
+      <a href="#terminal-sec" class="mob-link"><span>06</span> Terminal</a>
+      <a href="#contact" class="mob-link"><span>07</span> Contact</a>
+    </nav>
+    <div class="mobile-menu-foot">
+      <div class="m-status"><span class="dot-green"></span> Online &amp; Open to collaborate</div>
     </div>
   </div>
 
-  <!-- ═══════════════════════════════════ HERO SECTION ═══════════════════════════════════ -->
-  <main class="page-content">
-    <section id="hero" class="hero-section">
-      <div class="section-container hero-grid">
+  <!-- ═══════════════════════════════════ MAIN CONTENT ═══════════════════════════════════ -->
+  <main class="page-body">
 
-        <!-- Hero Left: Pitch & Persona -->
-        <div class="hero-left-content">
-          <div class="system-boot-badge">
-            <span class="boot-icon">⚡</span>
-            <span class="boot-text">// SYSTEM_BOOT :: RAMANEON_v4.2 :: FULLY_CHARGED</span>
+    <!-- ─── HERO SECTION ─── -->
+    <section id="hero" class="hero-section">
+      <div class="container hero-layout">
+
+        <!-- Left: Presentation -->
+        <div class="hero-text-block">
+          <div class="hero-pill-badge">
+            <span class="pulse-indicator"></span>
+            <span>Available for new projects &amp; collaborations</span>
           </div>
 
-          <h1 class="hero-title font-pixelify">
-            Hi, I'm <span class="highlight-yellow">Raman!</span>
-            <span class="title-underline"></span>
+          <h1 class="hero-heading">
+            Hi, I'm <span class="gold-gradient">Raman!</span>
           </h1>
 
-          <div class="hero-cycler-row font-mono">
-            <span class="cycler-prefix">SPECIALIZATION ::</span>
-            <span class="cycler-slot" id="cycler-text">Security Researcher</span>
-            <span class="cursor-blink">_</span>
+          <div class="hero-role-line">
+            <span class="role-intro">I specialize in</span>
+            <span class="role-cycler" id="role-cycler">Security Research</span>
+            <span class="typing-caret">|</span>
           </div>
 
-          <p class="hero-description">
-            I can build, reverse, break, or scale whatever you need — 
-            <span class="text-white font-bold italic">as long as I'm engineering high-voltage code or solving real-world security challenges.</span>
-            Preferably both.
+          <p class="hero-bio">
+            I build fast, resilient web applications and privacy-focused security tools.
+            Whether it's reverse-engineering mobile binaries, crafting interactive frontends,
+            or designing autonomous AI assistants — <span class="text-white font-medium">I enjoy solving complex engineering challenges from the ground up.</span>
           </p>
 
-          <!-- Current Mission Terminal Capsule -->
-          <div class="current-mission-box">
-            <div class="cm-head">
-              <span class="cm-dot"></span>
-              <span class="cm-label">CURRENT_MISSION</span>
-            </div>
-            <div class="cm-body font-mono">
-              <span class="text-cyan">target:</span> Architecting Next-Gen Threat Detection &amp; Autonomous AI Systems
+          <!-- Current Mission Pill -->
+          <div class="mission-card">
+            <div class="mission-tag">Current Focus</div>
+            <div class="mission-desc">
+              Building client-side security tools, threat log analyzers &amp; local autonomous neural agents.
             </div>
           </div>
 
           <!-- Hero Action Buttons -->
-          <div class="hero-cta-group">
-            <a href="#projects" class="btn-cyber-primary" data-cursor="VIEW">
-              <span class="btn-bracket">[</span>
-              <span class="btn-text">VIEW_WORK</span>
-              <span class="btn-bracket">]</span>
-              <span class="btn-glow"></span>
+          <div class="hero-actions">
+            <a href="#projects" class="primary-btn" data-cursor="Explore">
+              <span>View Projects</span>
+              <span class="btn-arrow">→</span>
             </a>
-            <a href="https://github.com/ramaneon" target="_blank" rel="noopener" class="btn-cyber-outline" data-cursor="REPOS">
+            <a href="https://github.com/ramaneon" target="_blank" rel="noopener" class="secondary-btn" data-cursor="GitHub">
               <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
-              <span>GITHUB_STREAK</span>
+              <span>GitHub Repos</span>
             </a>
-            <a href="#terminal-sec" class="btn-cyber-text" data-cursor="CLI">
-              <span>Launch Terminal →</span>
+            <a href="#contact" class="text-link-btn" data-cursor="Chat">
+              Let's Connect →
             </a>
           </div>
-
         </div>
 
-        <!-- Hero Right: Holographic Gamer HUD Card -->
-        <div class="hero-right-content">
-          <div class="gamer-hud-card tilt-card" id="hero-gamer-card">
-            <!-- HUD Reticle Corners -->
-            <div class="hud-corner tl"></div>
-            <div class="hud-corner tr"></div>
-            <div class="hud-corner bl"></div>
-            <div class="hud-corner br"></div>
+        <!-- Right: Sleek Player Stat Card -->
+        <div class="hero-card-block">
+          <div class="smooth-card player-stat-card tilt-card" id="hero-stat-card">
+            <div class="card-glow-edge"></div>
 
-            <div class="gh-header">
-              <div class="gh-avatar-wrap">
-                <img src="IMG_20260517_175855_0651.jpg" alt="Raman Kumar" class="gh-avatar" />
-                <span class="gh-avatar-status"></span>
+            <div class="player-card-head">
+              <div class="player-avatar-frame">
+                <img src="IMG_20260517_175855_0651.jpg" alt="Raman Kumar" class="player-photo" />
+                <span class="online-indicator"></span>
               </div>
-              <div class="gh-id">
-                <div class="gh-name-row">
-                  <span class="gh-name font-pixelify">RAMAN KUMAR</span>
-                  <span class="gh-rank-tag">LVL.99</span>
+              <div class="player-identity">
+                <div class="player-name-row">
+                  <h2 class="player-fullname">Raman Kumar</h2>
+                  <span class="player-level-badge">LVL 24</span>
                 </div>
-                <div class="gh-class-row font-mono">
-                  <span class="gh-pip"></span>
-                  <span>Cyber Mage &amp; Architect</span>
-                </div>
+                <p class="player-subtitle">Full-Stack Mage &amp; Security Researcher</p>
               </div>
             </div>
 
-            <!-- Stats Grid -->
-            <div class="gh-stats-list font-mono">
-              <div class="gh-stat-row">
-                <span class="stat-key">TOTAL EXPERIENCE</span>
-                <span class="stat-val text-white">2+ Years</span>
+            <!-- Stats List -->
+            <div class="player-stats-grid">
+              <div class="stat-item">
+                <span class="stat-name">Total Experience</span>
+                <span class="stat-number">2+ Years</span>
               </div>
-              <div class="gh-stat-row">
-                <span class="stat-key">PRODUCTION TOOLS</span>
-                <span class="stat-val text-yellow">15+ Shipped</span>
+              <div class="stat-item">
+                <span class="stat-name">Projects Shipped</span>
+                <span class="stat-number text-accent">15+</span>
               </div>
-              <div class="gh-stat-row">
-                <span class="stat-key">XP EARNED</span>
-                <span class="stat-val text-white">12,450 XP</span>
+              <div class="stat-item">
+                <span class="stat-name">XP Earned</span>
+                <span class="stat-number">12,450 XP</span>
               </div>
-              <div class="gh-stat-row">
-                <span class="stat-key">SECURITY RESEARCH</span>
-                <span class="stat-val text-yellow">Bug Bounty &amp; APKs</span>
+              <div class="stat-item">
+                <span class="stat-name">Bug Bounty &amp; APKs</span>
+                <span class="stat-number text-accent">Audited</span>
               </div>
-              <div class="gh-stat-row">
-                <span class="stat-key">YOUTUBE REACH</span>
-                <span class="stat-val text-white">@Techivibe</span>
+              <div class="stat-item">
+                <span class="stat-name">YouTube Channel</span>
+                <span class="stat-number">@Techivibe</span>
               </div>
-              <div class="gh-stat-row">
-                <span class="stat-key">GITHUB STATUS</span>
-                <span class="stat-val text-cyan">Active Commits</span>
+              <div class="stat-item">
+                <span class="stat-name">GitHub Streak</span>
+                <span class="stat-number text-green">45+ Days</span>
               </div>
             </div>
 
-            <!-- Spotify / Equalizer Pulse Widget -->
-            <div class="gh-audio-widget">
-              <div class="aw-icon">
-                <div class="eq-bars">
-                  <span class="bar b1"></span>
-                  <span class="bar b2"></span>
-                  <span class="bar b3"></span>
-                  <span class="bar b4"></span>
+            <!-- Playing / Live Telemetry Widget -->
+            <div class="music-telemetry-widget">
+              <div class="widget-icon">
+                <div class="wave-bars">
+                  <span></span><span></span><span></span><span></span>
                 </div>
               </div>
-              <div class="aw-info">
-                <span class="aw-track">Cyberpunk Synths · Overdrive Mode</span>
-                <span class="aw-meta">LIVE SYSTEM TELEMETRY :: 144 FPS</span>
+              <div class="widget-text">
+                <div class="widget-title">Deep Focus · Lo-Fi Synthwaves</div>
+                <div class="widget-sub">System running smoothly · 144 FPS WebGL</div>
               </div>
-              <div class="aw-badge">READY</div>
+              <div class="widget-chip">Live</div>
             </div>
 
           </div>
@@ -324,723 +267,669 @@
       </div>
     </section>
 
-    <!-- ═══════════════════════════════════ SECTION DIVIDER 01 ═══════════════════════════════════ -->
-    <div class="section-divider-wrap" data-reveal>
-      <div class="divider-loc"><span>SYS.LOC // </span><span class="text-yellow">SEC_01</span></div>
-      <div class="divider-line left-track"><span class="track-cap">◆</span><div class="track-bar"></div></div>
-      <div class="divider-pill">
-        <span class="pill-deco">//</span>
-        <span class="pill-label">SKILL_DECK</span>
-        <span class="pill-deco">//</span>
+    <!-- ─── SECTION DIVIDER 01 ─── -->
+    <div class="smooth-divider">
+      <div class="divider-track"></div>
+      <div class="divider-chip">
+        <span class="chip-star">✦</span>
+        <span class="chip-text">Skills &amp; Capabilities</span>
+        <span class="chip-star">✦</span>
       </div>
-      <div class="divider-line right-track"><div class="track-bar"></div><span class="track-cap">◆</span></div>
-      <div class="divider-mem"><span>MEM.SYS // </span><span class="text-yellow">99.4%</span></div>
+      <div class="divider-track"></div>
     </div>
 
-    <!-- ═══════════════════════════════════ SKILL DECK ═══════════════════════════════════ -->
-    <section id="skills" class="skills-section">
-      <div class="section-container">
+    <!-- ─── SKILLS SECTION ─── -->
+    <section id="skills" class="content-section">
+      <div class="container">
         
-        <div class="section-header text-center" data-reveal>
-          <h2 class="section-title font-pixelify">
-            <span class="text-yellow">Skill</span> Deck
+        <div class="section-title-wrap text-center">
+          <h2 class="section-heading">
+            Skill <span class="gold-gradient">Deck</span>
           </h2>
-          <p class="section-subtitle font-mono">// Hover cards to reveal cyber glow &amp; power metrics</p>
+          <p class="section-subheading">Hover over any card to reveal mastery level and power score</p>
         </div>
 
-        <div class="skills-grid" data-reveal>
+        <div class="skills-showcase-grid">
 
-          <!-- Skill 1: Python -->
-          <div class="skill-card gold tilt-card" data-category="backend">
-            <div class="skill-rank-badge rank-gold">★ GOLD</div>
-            <div class="skill-icon-wrap">
-              <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor"><path d="M11.914 0C5.82 0 6.2 2.646 6.2 2.646l.006 2.742h5.81v.83H3.84s-3.84-.44-3.84 5.8c0 6.242 3.35 6.027 3.35 6.027h1.996v-2.82s-.11-3.35 3.295-3.35h5.64v-.85s.385-4.836-2.37-4.836c0 0-.007-.003-.007-.003zm-2.03 1.834c.545 0 .988.443.988.988 0 .546-.443.99-.988.99a.99.99 0 0 1-.99-.99c0-.545.444-.988.99-.988zm2.202 22.166c6.094 0 5.714-2.646 5.714-2.646l-.006-2.742h-5.81v-.83h8.176s3.84.44 3.84-5.8c0-6.242-3.35-6.027-3.35-6.027h-1.996v2.82s.11 3.35-3.295 3.35h-5.64v.85s-.385 4.836 2.37 4.836c0 0 .007.003.007.003zm2.03-1.834a.99.99 0 0 1-.988-.988c0-.546.443-.99.988-.99.546 0 .99.444.99.99a.99.99 0 0 1-.99.988z"/></svg>
+          <!-- Python -->
+          <div class="smooth-card skill-box tilt-card">
+            <div class="skill-tier tier-gold">★ Master</div>
+            <div class="skill-icon-bubble">
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M11.914 0C5.82 0 6.2 2.646 6.2 2.646l.006 2.742h5.81v.83H3.84s-3.84-.44-3.84 5.8c0 6.242 3.35 6.027 3.35 6.027h1.996v-2.82s-.11-3.35 3.295-3.35h5.64v-.85s.385-4.836-2.37-4.836c0 0-.007-.003-.007-.003zm-2.03 1.834c.545 0 .988.443.988.988 0 .546-.443.99-.988.99a.99.99 0 0 1-.99-.99c0-.545.444-.988.99-.988zm2.202 22.166c6.094 0 5.714-2.646 5.714-2.646l-.006-2.742h-5.81v-.83h8.176s3.84.44 3.84-5.8c0-6.242-3.35-6.027-3.35-6.027h-1.996v2.82s.11 3.35-3.295 3.35h-5.64v.85s-.385 4.836 2.37 4.836c0 0 .007.003.007.003zm2.03-1.834a.99.99 0 0 1-.988-.988c0-.546.443-.99.988-.99.546 0 .99.444.99.99a.99.99 0 0 1-.99.988z"/></svg>
             </div>
-            <h3 class="skill-name">Python &amp; AsyncIO</h3>
-            <div class="skill-stat">
-              <div class="stat-labels font-mono"><span>PWR</span><span class="text-yellow">96/100</span></div>
-              <div class="stat-track"><div class="stat-fill glow-gold" style="width: 96%;"></div></div>
+            <h3 class="skill-title">Python &amp; AsyncIO</h3>
+            <div class="skill-meter">
+              <div class="meter-info"><span>Proficiency</span><span class="text-accent">96%</span></div>
+              <div class="meter-bar"><div class="meter-fill fill-gold" style="width: 96%;"></div></div>
             </div>
-            <p class="skill-desc">Security automation, reverse analysis, headless scrapers &amp; neural agents.</p>
+            <p class="skill-note">Automation workflows, security scripts, async scrapers &amp; neural backend services.</p>
           </div>
 
-          <!-- Skill 2: C / C++ & Low-Level -->
-          <div class="skill-card gold tilt-card" data-category="security">
-            <div class="skill-rank-badge rank-gold">★ GOLD</div>
-            <div class="skill-icon-wrap">
-              <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"></path><path d="M2 17l10 5 10-5"></path><path d="M2 12l10 5 10-5"></path></svg>
+          <!-- JavaScript & TypeScript -->
+          <div class="smooth-card skill-box tilt-card">
+            <div class="skill-tier tier-gold">★ Master</div>
+            <div class="skill-icon-bubble">
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M3 3h18v18H3V3zm13.7 13.9c.7 0 1.2-.3 1.5-.8l1.4.9c-.6 1.1-1.6 1.7-2.9 1.7-2.3 0-3.7-1.4-3.7-3.6 0-2.3 1.4-3.6 3.6-3.6 1.3 0 2.2.6 2.8 1.6l-1.4.9c-.3-.5-.8-.8-1.4-.8-1.2 0-1.8.8-1.8 1.9 0 1.2.6 2 1.5 2zM9.4 18.7c-1.2 0-2-.6-2.5-1.5l1.4-.9c.3.5.7.8 1.2.8.6 0 1-.3 1-.8v-4.8h1.8v4.9c0 1.5-1 2.3-2.9 2.3z"/></svg>
             </div>
-            <h3 class="skill-name">C / C++ &amp; Syscalls</h3>
-            <div class="skill-stat">
-              <div class="stat-labels font-mono"><span>PWR</span><span class="text-yellow">92/100</span></div>
-              <div class="stat-track"><div class="stat-fill glow-gold" style="width: 92%;"></div></div>
+            <h3 class="skill-title">JavaScript &amp; React</h3>
+            <div class="skill-meter">
+              <div class="meter-info"><span>Proficiency</span><span class="text-accent">94%</span></div>
+              <div class="meter-bar"><div class="meter-fill fill-gold" style="width: 94%;"></div></div>
             </div>
-            <p class="skill-desc">Win32 APIs, native memory management, reverse engineering &amp; telemetry.</p>
+            <p class="skill-note">Modern ESNext, React, client-side decompilers &amp; high-performance WebGL animations.</p>
           </div>
 
-          <!-- Skill 3: JavaScript / TypeScript -->
-          <div class="skill-card gold tilt-card" data-category="web">
-            <div class="skill-rank-badge rank-gold">★ GOLD</div>
-            <div class="skill-icon-wrap">
-              <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor"><path d="M3 3h18v18H3V3zm13.7 13.9c.7 0 1.2-.3 1.5-.8l1.4.9c-.6 1.1-1.6 1.7-2.9 1.7-2.3 0-3.7-1.4-3.7-3.6 0-2.3 1.4-3.6 3.6-3.6 1.3 0 2.2.6 2.8 1.6l-1.4.9c-.3-.5-.8-.8-1.4-.8-1.2 0-1.8.8-1.8 1.9 0 1.2.6 2 1.5 2zM9.4 18.7c-1.2 0-2-.6-2.5-1.5l1.4-.9c.3.5.7.8 1.2.8.6 0 1-.3 1-.8v-4.8h1.8v4.9c0 1.5-1 2.3-2.9 2.3z"/></svg>
+          <!-- C / C++ & Low-Level -->
+          <div class="smooth-card skill-box tilt-card">
+            <div class="skill-tier tier-gold">★ Master</div>
+            <div class="skill-icon-bubble">
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"></path><path d="M2 17l10 5 10-5"></path><path d="M2 12l10 5 10-5"></path></svg>
             </div>
-            <h3 class="skill-name">Modern JS / TypeScript</h3>
-            <div class="skill-stat">
-              <div class="stat-labels font-mono"><span>PWR</span><span class="text-yellow">95/100</span></div>
-              <div class="stat-track"><div class="stat-fill glow-gold" style="width: 95%;"></div></div>
+            <h3 class="skill-title">C / C++ &amp; Systems</h3>
+            <div class="skill-meter">
+              <div class="meter-info"><span>Proficiency</span><span class="text-accent">92%</span></div>
+              <div class="meter-bar"><div class="meter-fill fill-gold" style="width: 92%;"></div></div>
             </div>
-            <p class="skill-desc">ESNext, client-side decompilers, Three.js WebGL &amp; reactive frontends.</p>
+            <p class="skill-note">Low-level memory management, Win32 APIs, native hooks &amp; reverse engineering analysis.</p>
           </div>
 
-          <!-- Skill 4: Android & APK Decompilation -->
-          <div class="skill-card gold tilt-card" data-category="security">
-            <div class="skill-rank-badge rank-gold">★ GOLD</div>
-            <div class="skill-icon-wrap">
-              <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor"><path d="M17.523 15.3414c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.551 0 .9993.4482.9993.9993.0001.5511-.4482.9997-.9993.9997m-11.046 0c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993 0 .5511-.4482.9997-.9993.9997m11.4045-6.02l1.9973-3.4592a.416.416 0 00-.1521-.5676.416.416 0 00-.5676.1521l-2.0223 3.503C15.5902 8.4116 13.8533 8.0808 12 8.0808s-3.5902.3308-5.1367.8689L4.841 5.4467a.4161.4161 0 00-.5677-.1521.4157.4157 0 00-.1521.5676l1.9973 3.4592C2.6889 11.1867.3432 14.6589 0 18.761h24c-.3432-4.1021-2.6889-7.5743-6.1185-9.4396"/></svg>
+          <!-- Android APK & Mobile Security -->
+          <div class="smooth-card skill-box tilt-card">
+            <div class="skill-tier tier-gold">★ Master</div>
+            <div class="skill-icon-bubble">
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M17.523 15.3414c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.551 0 .9993.4482.9993.9993.0001.5511-.4482.9997-.9993.9997m-11.046 0c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993 0 .5511-.4482.9997-.9993.9997m11.4045-6.02l1.9973-3.4592a.416.416 0 00-.1521-.5676.416.416 0 00-.5676.1521l-2.0223 3.503C15.5902 8.4116 13.8533 8.0808 12 8.0808s-3.5902.3308-5.1367.8689L4.841 5.4467a.4161.4161 0 00-.5677-.1521.4157.4157 0 00-.1521.5676l1.9973 3.4592C2.6889 11.1867.3432 14.6589 0 18.761h24c-.3432-4.1021-2.6889-7.5743-6.1185-9.4396"/></svg>
             </div>
-            <h3 class="skill-name">Android APK Security</h3>
-            <div class="skill-stat">
-              <div class="stat-labels font-mono"><span>PWR</span><span class="text-yellow">94/100</span></div>
-              <div class="stat-track"><div class="stat-fill glow-gold" style="width: 94%;"></div></div>
+            <h3 class="skill-title">Android Security &amp; APKs</h3>
+            <div class="skill-meter">
+              <div class="meter-info"><span>Proficiency</span><span class="text-accent">93%</span></div>
+              <div class="meter-bar"><div class="meter-fill fill-gold" style="width: 93%;"></div></div>
             </div>
-            <p class="skill-desc">DEX decompilation, Kotlin, static bug bounty scanning &amp; leak extraction.</p>
+            <p class="skill-note">DEX analysis, manifest audits, Kotlin, and hunting exposed Firebase keys &amp; tokens.</p>
           </div>
 
-          <!-- Skill 5: SOC & Threat Analysis -->
-          <div class="skill-card silver tilt-card" data-category="security">
-            <div class="skill-rank-badge rank-silver">◆ SILVER</div>
-            <div class="skill-icon-wrap">
-              <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+          <!-- SOC & Threat Intelligence -->
+          <div class="smooth-card skill-box tilt-card">
+            <div class="skill-tier tier-silver">◆ Advanced</div>
+            <div class="skill-icon-bubble">
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
             </div>
-            <h3 class="skill-name">SOC &amp; MITRE ATT&amp;CK</h3>
-            <div class="skill-stat">
-              <div class="stat-labels font-mono"><span>PWR</span><span class="text-white">90/100</span></div>
-              <div class="stat-track"><div class="stat-fill glow-silver" style="width: 90%;"></div></div>
+            <h3 class="skill-title">SOC &amp; Threat Detection</h3>
+            <div class="skill-meter">
+              <div class="meter-info"><span>Proficiency</span><span class="text-white">90%</span></div>
+              <div class="meter-bar"><div class="meter-fill fill-silver" style="width: 90%;"></div></div>
             </div>
-            <p class="skill-desc">Log correlation engines, IOC extraction, Sigma rules &amp; attack mapping.</p>
+            <p class="skill-note">Log correlation engines, IOC extraction, MITRE ATT&amp;CK mappings &amp; incident triage.</p>
           </div>
 
-          <!-- Skill 6: Node.js & REST APIs -->
-          <div class="skill-card silver tilt-card" data-category="backend">
-            <div class="skill-rank-badge rank-silver">◆ SILVER</div>
-            <div class="skill-icon-wrap">
-              <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line x1="6" y1="18" x2="6.01" y2="18"></line></svg>
+          <!-- Node.js & Backend -->
+          <div class="smooth-card skill-box tilt-card">
+            <div class="skill-tier tier-silver">◆ Advanced</div>
+            <div class="skill-icon-bubble">
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line x1="6" y1="18" x2="6.01" y2="18"></line></svg>
             </div>
-            <h3 class="skill-name">Node.js &amp; Express/Fastify</h3>
-            <div class="skill-stat">
-              <div class="stat-labels font-mono"><span>PWR</span><span class="text-white">88/100</span></div>
-              <div class="stat-track"><div class="stat-fill glow-silver" style="width: 88%;"></div></div>
+            <h3 class="skill-title">Node.js &amp; APIs</h3>
+            <div class="skill-meter">
+              <div class="meter-info"><span>Proficiency</span><span class="text-white">88%</span></div>
+              <div class="meter-bar"><div class="meter-fill fill-silver" style="width: 88%;"></div></div>
             </div>
-            <p class="skill-desc">High-throughput microservices, WebSockets, REST APIs &amp; local gateways.</p>
+            <p class="skill-note">Fast REST services, WebSockets, real-time channels &amp; local automation servers.</p>
           </div>
 
-          <!-- Skill 7: Autonomous AI & LLM Pipelines -->
-          <div class="skill-card gold tilt-card" data-category="ai">
-            <div class="skill-rank-badge rank-gold">★ GOLD</div>
-            <div class="skill-icon-wrap">
-              <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+          <!-- Autonomous AI Agents -->
+          <div class="smooth-card skill-box tilt-card">
+            <div class="skill-tier tier-gold">★ Master</div>
+            <div class="skill-icon-bubble">
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
             </div>
-            <h3 class="skill-name">Autonomous AI &amp; JARVIS</h3>
-            <div class="skill-stat">
-              <div class="stat-labels font-mono"><span>PWR</span><span class="text-yellow">93/100</span></div>
-              <div class="stat-track"><div class="stat-fill glow-gold" style="width: 93%;"></div></div>
+            <h3 class="skill-title">Autonomous AI &amp; JARVIS</h3>
+            <div class="skill-meter">
+              <div class="meter-info"><span>Proficiency</span><span class="text-accent">93%</span></div>
+              <div class="meter-bar"><div class="meter-fill fill-gold" style="width: 93%;"></div></div>
             </div>
-            <p class="skill-desc">Local neural controllers, OCR vision pipelines, function calling &amp; agents.</p>
+            <p class="skill-note">Offline PC autopilot agents, OCR vision analysis, function calling &amp; local LLM pipelines.</p>
           </div>
 
-          <!-- Skill 8: Linux, Shell & DevOps -->
-          <div class="skill-card bronze tilt-card" data-category="devops">
-            <div class="skill-rank-badge rank-bronze">● BRONZE</div>
-            <div class="skill-icon-wrap">
-              <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
+          <!-- Linux & Security Tools -->
+          <div class="smooth-card skill-box tilt-card">
+            <div class="skill-tier tier-bronze">● Core</div>
+            <div class="skill-icon-bubble">
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
             </div>
-            <h3 class="skill-name">Linux &amp; Penetration Tools</h3>
-            <div class="skill-stat">
-              <div class="stat-labels font-mono"><span>PWR</span><span class="text-bronze">86/100</span></div>
-              <div class="stat-track"><div class="stat-fill glow-bronze" style="width: 86%;"></div></div>
+            <h3 class="skill-title">Linux &amp; Penetration Tools</h3>
+            <div class="skill-meter">
+              <div class="meter-info"><span>Proficiency</span><span class="text-orange">86%</span></div>
+              <div class="meter-bar"><div class="meter-fill fill-bronze" style="width: 86%;"></div></div>
             </div>
-            <p class="skill-desc">Kali Linux, Burp Suite, Ghidra, Bash scripting &amp; CTF tooling.</p>
+            <p class="skill-note">Kali Linux, Ghidra, Burp Suite, Bash automation, Docker &amp; CTF challenge solving.</p>
           </div>
 
         </div>
+
       </div>
     </section>
 
-    <!-- ═══════════════════════════════════ SECTION DIVIDER 02 ═══════════════════════════════════ -->
-    <div class="section-divider-wrap" data-reveal>
-      <div class="divider-loc"><span>SYS.LOC // </span><span class="text-yellow">SEC_02</span></div>
-      <div class="divider-line left-track"><span class="track-cap">◆</span><div class="track-bar"></div></div>
-      <div class="divider-pill">
-        <span class="pill-deco">//</span>
-        <span class="pill-label">QUEST_LOG</span>
-        <span class="pill-deco">//</span>
+    <!-- ─── SECTION DIVIDER 02 ─── -->
+    <div class="smooth-divider">
+      <div class="divider-track"></div>
+      <div class="divider-chip">
+        <span class="chip-star">✦</span>
+        <span class="chip-text">Experience &amp; Milestones</span>
+        <span class="chip-star">✦</span>
       </div>
-      <div class="divider-line right-track"><div class="track-bar"></div><span class="track-cap">◆</span></div>
-      <div class="divider-mem"><span>MEM.SYS // </span><span class="text-yellow">78.2%</span></div>
+      <div class="divider-track"></div>
     </div>
 
-    <!-- ═══════════════════════════════════ QUEST LOG (EXPERIENCE) ═══════════════════════════════════ -->
-    <section id="quests" class="quests-section">
-      <div class="section-container">
-        
-        <div class="section-header text-center" data-reveal>
-          <div class="quest-pill font-mono">
-            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-            <span>CAMPAIGN PROGRESSION</span>
-          </div>
-          <h2 class="section-title font-pixelify">The <span class="text-yellow">Grind</span></h2>
-          <p class="section-subtitle font-mono">// Level-up timeline &amp; battle-tested missions</p>
-        </div>
+    <!-- ─── EXPERIENCE / JOURNEY SECTION ─── -->
+    <section id="journey" class="content-section">
+      <div class="container">
 
-        <div class="timeline-container">
-          <div class="timeline-spine">
-            <div class="spine-pulse"></div>
-          </div>
-
-          <!-- Quest 1 -->
-          <div class="quest-row left-branch" data-reveal>
-            <div class="quest-card-wrap">
-              <div class="quest-card tilt-card">
-                <div class="quest-top-bar gold-accent">
-                  <span class="quest-status live-status">● ACTIVE QUEST</span>
-                  <span class="quest-xp-reward">+3500 XP</span>
-                </div>
-                <div class="quest-body">
-                  <div class="quest-dates font-mono">2026 — Present</div>
-                  <h3 class="quest-title">Lead Security Researcher &amp; Autonomous Agent Architect</h3>
-                  <div class="quest-org font-mono text-yellow">Independent &amp; Open Source Labs</div>
-                  <ul class="quest-perks">
-                    <li>Engineered <strong>SOCNEON</strong>, a 100% client-side privacy-first SOC Log Analyzer mapping events to MITRE ATT&amp;CK techniques.</li>
-                    <li>Developed <strong>JARVIS v2</strong>, a low-latency offline neural PC autopilot and holographic HUD with zero-cloud dependency.</li>
-                    <li>Performed static &amp; dynamic security audits across consumer Android applications, isolating Firebase misconfigurations and credential leaks.</li>
-                  </ul>
-                  <div class="quest-tags">
-                    <span class="q-tag">Threat Intel</span>
-                    <span class="q-tag">Reverse Eng</span>
-                    <span class="q-tag">MITRE ATT&amp;CK</span>
-                    <span class="q-tag">AI Agents</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="quest-center-node gold-node">
-              <div class="node-inner">⚔</div>
-            </div>
-            <div class="quest-empty-branch"></div>
-          </div>
-
-          <!-- Quest 2 -->
-          <div class="quest-row right-branch" data-reveal>
-            <div class="quest-empty-branch"></div>
-            <div class="quest-center-node cyan-node">
-              <div class="node-inner">🛡</div>
-            </div>
-            <div class="quest-card-wrap">
-              <div class="quest-card tilt-card">
-                <div class="quest-top-bar cyan-accent">
-                  <span class="quest-status done-status">✓ COMPLETED</span>
-                  <span class="quest-xp-reward">+2500 XP</span>
-                </div>
-                <div class="quest-body">
-                  <div class="quest-dates font-mono">2025 — 2026</div>
-                  <h3 class="quest-title">Android Security Researcher &amp; Bug Bounty Hunter</h3>
-                  <div class="quest-org font-mono text-cyan">Bug Bounty Programs &amp; Mobile Audits</div>
-                  <ul class="quest-perks">
-                    <li>Built the <strong>APK Decompiler &amp; Scanner</strong> web application, allowing security researchers to uncover embedded secrets in seconds.</li>
-                    <li>Participated in CTF competitions across TryHackMe and HackTheBox, specializing in Web Exploitation and Network Analysis.</li>
-                    <li>Published proof-of-concept scripts and automation tools for rapid triage of Android manifest permissions and exported components.</li>
-                  </ul>
-                  <div class="quest-tags">
-                    <span class="q-tag">APK Static Analysis</span>
-                    <span class="q-tag">Burp Suite</span>
-                    <span class="q-tag">Kotlin</span>
-                    <span class="q-tag">Firebase Scanners</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Quest 3 -->
-          <div class="quest-row left-branch" data-reveal>
-            <div class="quest-card-wrap">
-              <div class="quest-card tilt-card">
-                <div class="quest-top-bar yellow-accent">
-                  <span class="quest-status live-status">● ONGOING CAMPAIGN</span>
-                  <span class="quest-xp-reward">+2000 XP</span>
-                </div>
-                <div class="quest-body">
-                  <div class="quest-dates font-mono">2024 — Present</div>
-                  <h3 class="quest-title">Tech Creator &amp; Cybersecurity Educator</h3>
-                  <div class="quest-org font-mono text-yellow">@Techivibe (YouTube &amp; Socials)</div>
-                  <ul class="quest-perks">
-                    <li>Produce in-depth engineering breakdowns, reverse engineering walkthroughs, and practical guides on ethical hacking.</li>
-                    <li>Engaged thousands of aspiring engineers and researchers across video tutorials, repositories, and technical demos.</li>
-                    <li>Created open-source starter repos and tooling downloaded and forked by the community worldwide.</li>
-                  </ul>
-                  <div class="quest-tags">
-                    <span class="q-tag">Content Creation</span>
-                    <span class="q-tag">YouTube</span>
-                    <span class="q-tag">Community</span>
-                    <span class="q-tag">Technical Education</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="quest-center-node yellow-node">
-              <div class="node-inner">⚡</div>
-            </div>
-            <div class="quest-empty-branch"></div>
-          </div>
-
-        </div>
-      </div>
-    </section>
-
-    <!-- ═══════════════════════════════════ SECTION DIVIDER 03 ═══════════════════════════════════ -->
-    <div class="section-divider-wrap" data-reveal>
-      <div class="divider-loc"><span>SYS.LOC // </span><span class="text-yellow">SEC_03</span></div>
-      <div class="divider-line left-track"><span class="track-cap">◆</span><div class="track-bar"></div></div>
-      <div class="divider-pill">
-        <span class="pill-deco">//</span>
-        <span class="pill-label">PROJECT_VAULT</span>
-        <span class="pill-deco">//</span>
-      </div>
-      <div class="divider-line right-track"><div class="track-bar"></div><span class="track-cap">◆</span></div>
-      <div class="divider-mem"><span>MEM.SYS // </span><span class="text-yellow">45.0%</span></div>
-    </div>
-
-    <!-- ═══════════════════════════════════ FEATURED PROJECTS (GITHUB LIVE) ═══════════════════════════════════ -->
-    <section id="projects" class="projects-section">
-      <div class="section-container">
-        
-        <div class="section-header text-center" data-reveal>
-          <h2 class="section-title font-pixelify">
-            Featured <span class="text-yellow">Projects</span>
+        <div class="section-title-wrap text-center">
+          <div class="experience-chip">Career Progression</div>
+          <h2 class="section-heading">
+            The <span class="gold-gradient">Journey</span>
           </h2>
-          <p class="section-subtitle font-mono">// Verified production deployments and open-source GitHub repositories</p>
+          <p class="section-subheading">A timeline of key roles, security investigations, and open-source contributions</p>
         </div>
 
-        <!-- Project Filter Buttons -->
-        <div class="project-filters font-mono" data-reveal>
-          <button class="filter-btn active" data-filter="all">ALL</button>
-          <button class="filter-btn" data-filter="security">SECURITY &amp; SOC</button>
-          <button class="filter-btn" data-filter="ai">AI &amp; AUTONOMOUS</button>
-          <button class="filter-btn" data-filter="tools">TOOLS &amp; UTILITIES</button>
-        </div>
+        <div class="timeline-wrapper">
+          <div class="timeline-center-line"></div>
 
-        <!-- Project Cards Grid -->
-        <div class="projects-grid" data-reveal>
-
-          <!-- Project 1: SOCNEON -->
-          <div class="project-card tilt-card" data-category="security">
-            <div class="browser-bar">
-              <div class="browser-dots">
-                <span class="b-dot red"></span>
-                <span class="b-dot yellow"></span>
-                <span class="b-dot green"></span>
-              </div>
-              <div class="browser-url font-mono">ramaneon.github.io/socneon</div>
-              <div class="browser-status"><span class="live-dot pulse"></span>LIVE</div>
-            </div>
-            <div class="project-preview-box">
-              <div class="preview-hologram">
-                <div class="holo-scan"></div>
-                <div class="holo-icon">🛡️</div>
-                <div class="holo-tag font-mono">MITRE ATT&amp;CK CORRELATOR</div>
-              </div>
-              <div class="preview-overlay">
-                <a href="https://ramaneon.github.io/socneon/" target="_blank" rel="noopener" class="preview-view-btn font-mono">LAUNCH LIVE APP ↗</a>
-              </div>
-            </div>
-            <div class="project-body">
-              <div class="project-title-row">
-                <h3 class="project-title">socneon</h3>
-                <div class="project-links">
-                  <a href="https://github.com/ramaneon/socneon" target="_blank" rel="noopener" title="Source Code" class="p-link" data-cursor="CODE">
-                    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
-                  </a>
-                  <a href="https://ramaneon.github.io/socneon/" target="_blank" rel="noopener" title="Live Deployment" class="p-link" data-cursor="LIVE">
-                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-                  </a>
+          <!-- Milestone 1 -->
+          <div class="timeline-row row-left">
+            <div class="timeline-card-col">
+              <div class="smooth-card timeline-card tilt-card">
+                <div class="timeline-header">
+                  <span class="timeline-status status-active">Current Focus</span>
+                  <span class="timeline-xp">+3,500 XP</span>
+                </div>
+                <div class="timeline-body">
+                  <span class="timeline-dates">2026 — Present</span>
+                  <h3 class="timeline-role">Lead Security Researcher &amp; AI Systems Builder</h3>
+                  <div class="timeline-company text-accent">Independent &amp; Open Source Labs</div>
+                  <ul class="timeline-points">
+                    <li>Engineered <strong>SOCNEON</strong>, a 100% in-browser threat analyzer that maps security events directly to MITRE ATT&amp;CK techniques.</li>
+                    <li>Developed <strong>JARVIS v2</strong>, a native offline PC controller with sub-second response times and zero cloud overhead.</li>
+                    <li>Conducting ongoing security evaluations across Android applications, helping developers fix dangerous permissions and credential exposures.</li>
+                  </ul>
+                  <div class="tag-row">
+                    <span class="soft-tag">Threat Intel</span>
+                    <span class="soft-tag">Reverse Engineering</span>
+                    <span class="soft-tag">Autonomous AI</span>
+                  </div>
                 </div>
               </div>
-              <p class="project-desc">
-                Privacy-first client-side SOC Log Analyzer with MITRE ATT&amp;CK mapping, automated IOC extraction, threat correlation engine, and zero-server data leakage.
-              </p>
-              <div class="project-tech-tags font-mono">
-                <span class="p-tag">JavaScript</span>
-                <span class="p-tag">MITRE ATT&amp;CK</span>
-                <span class="p-tag">IOC Parser</span>
-                <span class="p-tag">Client-Side</span>
+            </div>
+            <div class="timeline-node-col">
+              <div class="timeline-node node-gold">⚡</div>
+            </div>
+            <div class="timeline-spacer-col"></div>
+          </div>
+
+          <!-- Milestone 2 -->
+          <div class="timeline-row row-right">
+            <div class="timeline-spacer-col"></div>
+            <div class="timeline-node-col">
+              <div class="timeline-node node-cyan">🛡️</div>
+            </div>
+            <div class="timeline-card-col">
+              <div class="smooth-card timeline-card tilt-card">
+                <div class="timeline-header">
+                  <span class="timeline-status status-completed">Completed</span>
+                  <span class="timeline-xp">+2,500 XP</span>
+                </div>
+                <div class="timeline-body">
+                  <span class="timeline-dates">2025 — 2026</span>
+                  <h3 class="timeline-role">Android Security Researcher &amp; Bug Hunter</h3>
+                  <div class="timeline-company text-cyan">Bug Bounty Programs &amp; Mobile Audits</div>
+                  <ul class="timeline-points">
+                    <li>Created the <strong>APK Decompiler &amp; Scanner</strong>, enabling researchers to instantly spot embedded Firebase links and secret keys.</li>
+                    <li>Actively solved network security and web exploitation labs across TryHackMe and HackTheBox.</li>
+                    <li>Published automated scripts for rapid triaging of Android components and exposed storage configurations.</li>
+                  </ul>
+                  <div class="tag-row">
+                    <span class="soft-tag">APK Static Analysis</span>
+                    <span class="soft-tag">Burp Suite</span>
+                    <span class="soft-tag">Secret Hunting</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
 
-          <!-- Project 2: APK Decompiler -->
-          <div class="project-card tilt-card" data-category="security">
-            <div class="browser-bar">
-              <div class="browser-dots">
-                <span class="b-dot red"></span>
-                <span class="b-dot yellow"></span>
-                <span class="b-dot green"></span>
-              </div>
-              <div class="browser-url font-mono">ramaneon.github.io/apk-decompiler</div>
-              <div class="browser-status"><span class="live-dot pulse"></span>LIVE</div>
-            </div>
-            <div class="project-preview-box">
-              <div class="preview-hologram">
-                <div class="holo-scan"></div>
-                <div class="holo-icon">📱</div>
-                <div class="holo-tag font-mono">ANDROID BUG BOUNTY SCANNER</div>
-              </div>
-              <div class="preview-overlay">
-                <a href="https://ramaneon.github.io/apk-decompiler/" target="_blank" rel="noopener" class="preview-view-btn font-mono">LAUNCH LIVE APP ↗</a>
-              </div>
-            </div>
-            <div class="project-body">
-              <div class="project-title-row">
-                <h3 class="project-title">apk-decompiler</h3>
-                <div class="project-links">
-                  <a href="https://github.com/ramaneon/apk-decompiler" target="_blank" rel="noopener" title="Source Code" class="p-link" data-cursor="CODE">
-                    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
-                  </a>
-                  <a href="https://ramaneon.github.io/apk-decompiler/" target="_blank" rel="noopener" title="Live Deployment" class="p-link" data-cursor="LIVE">
-                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-                  </a>
+          <!-- Milestone 3 -->
+          <div class="timeline-row row-left">
+            <div class="timeline-card-col">
+              <div class="smooth-card timeline-card tilt-card">
+                <div class="timeline-header">
+                  <span class="timeline-status status-active">Active</span>
+                  <span class="timeline-xp">+2,000 XP</span>
+                </div>
+                <div class="timeline-body">
+                  <span class="timeline-dates">2024 — Present</span>
+                  <h3 class="timeline-role">Tech Creator &amp; Cybersecurity Educator</h3>
+                  <div class="timeline-company text-accent">@Techivibe (YouTube &amp; Socials)</div>
+                  <ul class="timeline-points">
+                    <li>Produce easy-to-follow technical guides, practical hacking demos, and engineering breakdowns for curious builders.</li>
+                    <li>Cultivated an engaged audience across videos, tutorials, and shared GitHub repositories.</li>
+                    <li>Open-sourced tools, scripts, and starter code used by hundreds of students and developers.</li>
+                  </ul>
+                  <div class="tag-row">
+                    <span class="soft-tag">Content Creation</span>
+                    <span class="soft-tag">Community</span>
+                    <span class="soft-tag">Tech Education</span>
+                  </div>
                 </div>
               </div>
-              <p class="project-desc">
-                Android Bug Bounty Analyzer &amp; Decompiler — instant in-browser scanner hunting exposed Firebase DB URLs, API secret keys, AWS tokens, and dangerous permissions.
-              </p>
-              <div class="project-tech-tags font-mono">
-                <span class="p-tag">Android</span>
-                <span class="p-tag">Firebase Hunter</span>
-                <span class="p-tag">Secret Scanner</span>
-                <span class="p-tag">Static Analysis</span>
-              </div>
             </div>
-          </div>
-
-          <!-- Project 3: JARVIS v2 -->
-          <div class="project-card tilt-card" data-category="ai">
-            <div class="browser-bar">
-              <div class="browser-dots">
-                <span class="b-dot red"></span>
-                <span class="b-dot yellow"></span>
-                <span class="b-dot green"></span>
-              </div>
-              <div class="browser-url font-mono">github.com/ramaneon/jarvisV2</div>
-              <div class="browser-status"><span class="live-dot pulse"></span>CORE</div>
+            <div class="timeline-node-col">
+              <div class="timeline-node node-purple">🎬</div>
             </div>
-            <div class="project-preview-box">
-              <div class="preview-hologram">
-                <div class="holo-scan"></div>
-                <div class="holo-icon">🤖</div>
-                <div class="holo-tag font-mono">AUTONOMOUS PC AUTOPILOT</div>
-              </div>
-              <div class="preview-overlay">
-                <a href="https://github.com/ramaneon/jarvisV2" target="_blank" rel="noopener" class="preview-view-btn font-mono">INSPECT REPO ↗</a>
-              </div>
-            </div>
-            <div class="project-body">
-              <div class="project-title-row">
-                <h3 class="project-title">jarvisV2</h3>
-                <div class="project-links">
-                  <a href="https://github.com/ramaneon/jarvisV2" target="_blank" rel="noopener" title="Source Code" class="p-link" data-cursor="CODE">
-                    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
-                  </a>
-                </div>
-              </div>
-              <p class="project-desc">
-                Fast Native PC Controller &amp; Holographic Interface. Features zero-API offline execution, sub-second latency commands, and headless autonomous orchestration.
-              </p>
-              <div class="project-tech-tags font-mono">
-                <span class="p-tag">Python</span>
-                <span class="p-tag">Autonomous Agent</span>
-                <span class="p-tag">Win32 Hooks</span>
-                <span class="p-tag">Offline AI</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Project 4: JARVIS Local with API -->
-          <div class="project-card tilt-card" data-category="ai">
-            <div class="browser-bar">
-              <div class="browser-dots">
-                <span class="b-dot red"></span>
-                <span class="b-dot yellow"></span>
-                <span class="b-dot green"></span>
-              </div>
-              <div class="browser-url font-mono">github.com/ramaneon/jarvis-local-with-api</div>
-              <div class="browser-status"><span class="live-dot pulse"></span>CORE</div>
-            </div>
-            <div class="project-preview-box">
-              <div class="preview-hologram">
-                <div class="holo-scan"></div>
-                <div class="holo-icon">⚡</div>
-                <div class="holo-tag font-mono">LOCAL REST AI GATEWAY</div>
-              </div>
-              <div class="preview-overlay">
-                <a href="https://github.com/ramaneon/jarvis-local-with-api" target="_blank" rel="noopener" class="preview-view-btn font-mono">INSPECT REPO ↗</a>
-              </div>
-            </div>
-            <div class="project-body">
-              <div class="project-title-row">
-                <h3 class="project-title">jarvis-local-with-api</h3>
-                <div class="project-links">
-                  <a href="https://github.com/ramaneon/jarvis-local-with-api" target="_blank" rel="noopener" title="Source Code" class="p-link" data-cursor="CODE">
-                    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
-                  </a>
-                </div>
-              </div>
-              <p class="project-desc">
-                Local AI Gateway, Holographic HUD, System Autopilot &amp; REST API for Windows. Bridges local hardware with voice synthesis and real-time execution endpoints.
-              </p>
-              <div class="project-tech-tags font-mono">
-                <span class="p-tag">JavaScript</span>
-                <span class="p-tag">REST API</span>
-                <span class="p-tag">Holo HUD</span>
-                <span class="p-tag">Windows Automation</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Project 5: Drive Analyzer -->
-          <div class="project-card tilt-card" data-category="tools">
-            <div class="browser-bar">
-              <div class="browser-dots">
-                <span class="b-dot red"></span>
-                <span class="b-dot yellow"></span>
-                <span class="b-dot green"></span>
-              </div>
-              <div class="browser-url font-mono">ramaneon.github.io/drive-analyzer</div>
-              <div class="browser-status"><span class="live-dot pulse"></span>LIVE</div>
-            </div>
-            <div class="project-preview-box">
-              <div class="preview-hologram">
-                <div class="holo-scan"></div>
-                <div class="holo-icon">💾</div>
-                <div class="holo-tag font-mono">ZERO-UPLOAD STORAGE ANALYZER</div>
-              </div>
-              <div class="preview-overlay">
-                <a href="https://ramaneon.github.io/drive-analyzer/" target="_blank" rel="noopener" class="preview-view-btn font-mono">LAUNCH LIVE APP ↗</a>
-              </div>
-            </div>
-            <div class="project-body">
-              <div class="project-title-row">
-                <h3 class="project-title">drive-analyzer</h3>
-                <div class="project-links">
-                  <a href="https://github.com/ramaneon/drive-analyzer" target="_blank" rel="noopener" title="Source Code" class="p-link" data-cursor="CODE">
-                    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
-                  </a>
-                  <a href="https://ramaneon.github.io/drive-analyzer/" target="_blank" rel="noopener" title="Live Deployment" class="p-link" data-cursor="LIVE">
-                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-                  </a>
-                </div>
-              </div>
-              <p class="project-desc">
-                High-speed local storage analysis in your browser. Visualizes heavy directories, duplicate binaries, and system junk with 100% privacy and zero file uploads.
-              </p>
-              <div class="project-tech-tags font-mono">
-                <span class="p-tag">JavaScript</span>
-                <span class="p-tag">File System API</span>
-                <span class="p-tag">Visualization</span>
-                <span class="p-tag">Privacy</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Project 6: Routine APK Suite -->
-          <div class="project-card tilt-card" data-category="tools">
-            <div class="browser-bar">
-              <div class="browser-dots">
-                <span class="b-dot red"></span>
-                <span class="b-dot yellow"></span>
-                <span class="b-dot green"></span>
-              </div>
-              <div class="browser-url font-mono">github.com/ramaneon/routine</div>
-              <div class="browser-status"><span class="live-dot pulse"></span>CORE</div>
-            </div>
-            <div class="project-preview-box">
-              <div class="preview-hologram">
-                <div class="holo-scan"></div>
-                <div class="holo-icon">⚙️</div>
-                <div class="holo-tag font-mono">NATIVE ANDROID WORKFLOW</div>
-              </div>
-              <div class="preview-overlay">
-                <a href="https://github.com/ramaneon/routine" target="_blank" rel="noopener" class="preview-view-btn font-mono">INSPECT REPO ↗</a>
-              </div>
-            </div>
-            <div class="project-body">
-              <div class="project-title-row">
-                <h3 class="project-title">routine</h3>
-                <div class="project-links">
-                  <a href="https://github.com/ramaneon/routine" target="_blank" rel="noopener" title="Source Code" class="p-link" data-cursor="CODE">
-                    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
-                  </a>
-                </div>
-              </div>
-              <p class="project-desc">
-                Lightweight, high-performance native Android utility and automation suite written in Kotlin. Focuses on daily background optimization and tool management.
-              </p>
-              <div class="project-tech-tags font-mono">
-                <span class="p-tag">Kotlin</span>
-                <span class="p-tag">Android SDK</span>
-                <span class="p-tag">Automation</span>
-                <span class="p-tag">APK Package</span>
-              </div>
-            </div>
+            <div class="timeline-spacer-col"></div>
           </div>
 
         </div>
 
-        <div class="vault-cta-wrap text-center" data-reveal>
-          <a href="https://github.com/ramaneon?tab=repositories" target="_blank" rel="noopener" class="btn-cyber-primary" data-cursor="ALL REPOS">
-            <span class="btn-bracket">[</span>
-            <span class="btn-text">EXPLORE ALL REPOSITORIES ON GITHUB</span>
-            <span class="btn-bracket">]</span>
-            <span class="btn-glow"></span>
+      </div>
+    </section>
+
+    <!-- ─── SECTION DIVIDER 03 ─── -->
+    <div class="smooth-divider">
+      <div class="divider-track"></div>
+      <div class="divider-chip">
+        <span class="chip-star">✦</span>
+        <span class="chip-text">Featured Work</span>
+        <span class="chip-star">✦</span>
+      </div>
+      <div class="divider-track"></div>
+    </div>
+
+    <!-- ─── FEATURED PROJECTS (GITHUB SHOWCASE) ─── -->
+    <section id="projects" class="content-section">
+      <div class="container">
+
+        <div class="section-title-wrap text-center">
+          <h2 class="section-heading">
+            Featured <span class="gold-gradient">Projects</span>
+          </h2>
+          <p class="section-subheading">Selected open-source repositories and live interactive deployments</p>
+        </div>
+
+        <!-- Filter Pill Tabs -->
+        <div class="filter-pill-group">
+          <button class="pill-btn active" data-filter="all">All</button>
+          <button class="pill-btn" data-filter="security">Security &amp; SOC</button>
+          <button class="pill-btn" data-filter="ai">AI &amp; Autonomous</button>
+          <button class="pill-btn" data-filter="tools">Utilities &amp; Tools</button>
+        </div>
+
+        <!-- Projects Grid -->
+        <div class="project-cards-grid">
+
+          <!-- 1. SOCNEON -->
+          <div class="smooth-card project-tile tilt-card" data-category="security">
+            <div class="browser-mockup-bar">
+              <div class="mockup-dots">
+                <span class="dot red"></span>
+                <span class="dot yellow"></span>
+                <span class="dot green"></span>
+              </div>
+              <div class="mockup-url">ramaneon.github.io/socneon</div>
+              <span class="mockup-live">Live App</span>
+            </div>
+            <div class="project-banner banner-soc">
+              <div class="banner-badge">MITRE ATT&amp;CK Correlator</div>
+              <div class="banner-icon">🛡️</div>
+              <div class="banner-hover-action">
+                <a href="https://ramaneon.github.io/socneon/" target="_blank" rel="noopener" class="launch-btn">Open Live App ↗</a>
+              </div>
+            </div>
+            <div class="project-content">
+              <div class="project-header-row">
+                <h3 class="project-name">socneon</h3>
+                <div class="project-external-links">
+                  <a href="https://github.com/ramaneon/socneon" target="_blank" rel="noopener" title="View Source" class="icon-link" data-cursor="Code">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
+                  </a>
+                  <a href="https://ramaneon.github.io/socneon/" target="_blank" rel="noopener" title="Live Demo" class="icon-link" data-cursor="Demo">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                  </a>
+                </div>
+              </div>
+              <p class="project-summary">
+                A privacy-first, client-side SOC log analyzer that correlates incidents and maps threat patterns directly to MITRE ATT&amp;CK without uploading logs to any server.
+              </p>
+              <div class="tech-pill-list">
+                <span class="tech-pill">JavaScript</span>
+                <span class="tech-pill">MITRE ATT&amp;CK</span>
+                <span class="tech-pill">Threat Intel</span>
+                <span class="tech-pill">Zero-Upload</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. APK DECOMPILER -->
+          <div class="smooth-card project-tile tilt-card" data-category="security">
+            <div class="browser-mockup-bar">
+              <div class="mockup-dots">
+                <span class="dot red"></span>
+                <span class="dot yellow"></span>
+                <span class="dot green"></span>
+              </div>
+              <div class="mockup-url">ramaneon.github.io/apk-decompiler</div>
+              <span class="mockup-live">Live App</span>
+            </div>
+            <div class="project-banner banner-apk">
+              <div class="banner-badge">Android Secret Scanner</div>
+              <div class="banner-icon">📱</div>
+              <div class="banner-hover-action">
+                <a href="https://ramaneon.github.io/apk-decompiler/" target="_blank" rel="noopener" class="launch-btn">Open Live App ↗</a>
+              </div>
+            </div>
+            <div class="project-content">
+              <div class="project-header-row">
+                <h3 class="project-name">apk-decompiler</h3>
+                <div class="project-external-links">
+                  <a href="https://github.com/ramaneon/apk-decompiler" target="_blank" rel="noopener" title="View Source" class="icon-link" data-cursor="Code">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
+                  </a>
+                  <a href="https://ramaneon.github.io/apk-decompiler/" target="_blank" rel="noopener" title="Live Demo" class="icon-link" data-cursor="Demo">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                  </a>
+                </div>
+              </div>
+              <p class="project-summary">
+                A browser-based mobile security utility that decompiles APK archives locally, scanning for exposed Firebase databases, hardcoded API credentials, and sensitive tokens.
+              </p>
+              <div class="tech-pill-list">
+                <span class="tech-pill">Android</span>
+                <span class="tech-pill">Firebase Scanner</span>
+                <span class="tech-pill">Secret Auditing</span>
+                <span class="tech-pill">Client-Side</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. JARVIS V2 -->
+          <div class="smooth-card project-tile tilt-card" data-category="ai">
+            <div class="browser-mockup-bar">
+              <div class="mockup-dots">
+                <span class="dot red"></span>
+                <span class="dot yellow"></span>
+                <span class="dot green"></span>
+              </div>
+              <div class="mockup-url">github.com/ramaneon/jarvisV2</div>
+              <span class="mockup-live">Core Repo</span>
+            </div>
+            <div class="project-banner banner-jarvis">
+              <div class="banner-badge">Offline Neural Controller</div>
+              <div class="banner-icon">🤖</div>
+              <div class="banner-hover-action">
+                <a href="https://github.com/ramaneon/jarvisV2" target="_blank" rel="noopener" class="launch-btn">Explore Repository ↗</a>
+              </div>
+            </div>
+            <div class="project-content">
+              <div class="project-header-row">
+                <h3 class="project-name">jarvisV2</h3>
+                <div class="project-external-links">
+                  <a href="https://github.com/ramaneon/jarvisV2" target="_blank" rel="noopener" title="View Source" class="icon-link" data-cursor="Code">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
+                  </a>
+                </div>
+              </div>
+              <p class="project-summary">
+                A fast, native PC controller and holographic interface engineered for zero-API offline operations, system automation, and autonomous task dispatch.
+              </p>
+              <div class="tech-pill-list">
+                <span class="tech-pill">Python</span>
+                <span class="tech-pill">Autonomous Agent</span>
+                <span class="tech-pill">Win32 Hooks</span>
+                <span class="tech-pill">Offline AI</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4. JARVIS LOCAL WITH API -->
+          <div class="smooth-card project-tile tilt-card" data-category="ai">
+            <div class="browser-mockup-bar">
+              <div class="mockup-dots">
+                <span class="dot red"></span>
+                <span class="dot yellow"></span>
+                <span class="dot green"></span>
+              </div>
+              <div class="mockup-url">github.com/ramaneon/jarvis-local-with-api</div>
+              <span class="mockup-live">Core Repo</span>
+            </div>
+            <div class="project-banner banner-gateway">
+              <div class="banner-badge">Holographic HUD Gateway</div>
+              <div class="banner-icon">⚡</div>
+              <div class="banner-hover-action">
+                <a href="https://github.com/ramaneon/jarvis-local-with-api" target="_blank" rel="noopener" class="launch-btn">Explore Repository ↗</a>
+              </div>
+            </div>
+            <div class="project-content">
+              <div class="project-header-row">
+                <h3 class="project-name">jarvis-local-with-api</h3>
+                <div class="project-external-links">
+                  <a href="https://github.com/ramaneon/jarvis-local-with-api" target="_blank" rel="noopener" title="View Source" class="icon-link" data-cursor="Code">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
+                  </a>
+                </div>
+              </div>
+              <p class="project-summary">
+                A localized AI gateway that exposes a clean REST API on Windows, enabling external apps to invoke voice synthesis, holographic displays, and PC autopilot routines.
+              </p>
+              <div class="tech-pill-list">
+                <span class="tech-pill">JavaScript</span>
+                <span class="tech-pill">REST API</span>
+                <span class="tech-pill">Windows System</span>
+                <span class="tech-pill">Holo UI</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 5. DRIVE ANALYZER -->
+          <div class="smooth-card project-tile tilt-card" data-category="tools">
+            <div class="browser-mockup-bar">
+              <div class="mockup-dots">
+                <span class="dot red"></span>
+                <span class="dot yellow"></span>
+                <span class="dot green"></span>
+              </div>
+              <div class="mockup-url">ramaneon.github.io/drive-analyzer</div>
+              <span class="mockup-live">Live App</span>
+            </div>
+            <div class="project-banner banner-drive">
+              <div class="banner-badge">Storage Visualization</div>
+              <div class="banner-icon">💾</div>
+              <div class="banner-hover-action">
+                <a href="https://ramaneon.github.io/drive-analyzer/" target="_blank" rel="noopener" class="launch-btn">Open Live App ↗</a>
+              </div>
+            </div>
+            <div class="project-content">
+              <div class="project-header-row">
+                <h3 class="project-name">drive-analyzer</h3>
+                <div class="project-external-links">
+                  <a href="https://github.com/ramaneon/drive-analyzer" target="_blank" rel="noopener" title="View Source" class="icon-link" data-cursor="Code">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
+                  </a>
+                  <a href="https://ramaneon.github.io/drive-analyzer/" target="_blank" rel="noopener" title="Live Demo" class="icon-link" data-cursor="Demo">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                  </a>
+                </div>
+              </div>
+              <p class="project-summary">
+                A blazing-fast local disk explorer running directly inside your browser. Visualizes heavy folders, duplicate files, and system waste without uploading a single byte.
+              </p>
+              <div class="tech-pill-list">
+                <span class="tech-pill">JavaScript</span>
+                <span class="tech-pill">File System API</span>
+                <span class="tech-pill">Privacy First</span>
+                <span class="tech-pill">Visualization</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 6. ROUTINE APK -->
+          <div class="smooth-card project-tile tilt-card" data-category="tools">
+            <div class="browser-mockup-bar">
+              <div class="mockup-dots">
+                <span class="dot red"></span>
+                <span class="dot yellow"></span>
+                <span class="dot green"></span>
+              </div>
+              <div class="mockup-url">github.com/ramaneon/routine</div>
+              <span class="mockup-live">Core Repo</span>
+            </div>
+            <div class="project-banner banner-routine">
+              <div class="banner-badge">Android Automation App</div>
+              <div class="banner-icon">⚙️</div>
+              <div class="banner-hover-action">
+                <a href="https://github.com/ramaneon/routine" target="_blank" rel="noopener" class="launch-btn">Explore Repository ↗</a>
+              </div>
+            </div>
+            <div class="project-content">
+              <div class="project-header-row">
+                <h3 class="project-name">routine</h3>
+                <div class="project-external-links">
+                  <a href="https://github.com/ramaneon/routine" target="_blank" rel="noopener" title="View Source" class="icon-link" data-cursor="Code">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
+                  </a>
+                </div>
+              </div>
+              <p class="project-summary">
+                A lightweight native Android utility built in Kotlin designed for managing daily device routines, quick actions, and automated background optimization.
+              </p>
+              <div class="tech-pill-list">
+                <span class="tech-pill">Kotlin</span>
+                <span class="tech-pill">Android SDK</span>
+                <span class="tech-pill">Automation</span>
+                <span class="tech-pill">Native App</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="projects-cta text-center">
+          <a href="https://github.com/ramaneon?tab=repositories" target="_blank" rel="noopener" class="primary-btn" data-cursor="GitHub">
+            <span>Explore All 15+ Repositories on GitHub</span>
+            <span class="btn-arrow">↗</span>
           </a>
         </div>
 
       </div>
     </section>
 
-    <!-- ═══════════════════════════════════ SECTION DIVIDER 04 ═══════════════════════════════════ -->
-    <div class="section-divider-wrap" data-reveal>
-      <div class="divider-loc"><span>SYS.LOC // </span><span class="text-yellow">SEC_04</span></div>
-      <div class="divider-line left-track"><span class="track-cap">◆</span><div class="track-bar"></div></div>
-      <div class="divider-pill">
-        <span class="pill-deco">//</span>
-        <span class="pill-label">ACHIEVEMENTS</span>
-        <span class="pill-deco">//</span>
+    <!-- ─── SECTION DIVIDER 04 ─── -->
+    <div class="smooth-divider">
+      <div class="divider-track"></div>
+      <div class="divider-chip">
+        <span class="chip-star">✦</span>
+        <span class="chip-text">Achievements &amp; Metrics</span>
+        <span class="chip-star">✦</span>
       </div>
-      <div class="divider-line right-track"><div class="track-bar"></div><span class="track-cap">◆</span></div>
-      <div class="divider-mem"><span>MEM.SYS // </span><span class="text-yellow">100%</span></div>
+      <div class="divider-track"></div>
     </div>
 
-    <!-- ═══════════════════════════════════ ACHIEVEMENTS UNLOCKED ═══════════════════════════════════ -->
-    <section id="achievements" class="achievements-section">
-      <div class="section-container">
-        
-        <div class="section-header text-center" data-reveal>
-          <h2 class="section-title font-pixelify">
-            Achievements <span class="text-yellow">Unlocked</span>
+    <!-- ─── ACHIEVEMENTS / HIGHLIGHTS SECTION ─── -->
+    <section id="highlights" class="content-section">
+      <div class="container">
+
+        <div class="section-title-wrap text-center">
+          <h2 class="section-heading">
+            Milestones &amp; <span class="gold-gradient">Highlights</span>
           </h2>
-          <p class="section-subtitle font-mono">// Battle-tested milestones, metrics &amp; verified accomplishments</p>
+          <p class="section-subheading">Key accomplishments that reflect persistence and code craftsmanship</p>
         </div>
 
-        <div class="achievements-grid" data-reveal>
+        <div class="highlights-grid">
 
-          <div class="achievement-card tilt-card">
-            <div class="ach-head">
-              <div class="ach-icon gold-icon">🏆</div>
-              <div class="ach-metric font-mono">
-                <span class="metric-key">SCORE</span>
-                <span class="metric-val text-yellow">100%</span>
-              </div>
+          <div class="smooth-card highlight-card tilt-card">
+            <div class="hl-header">
+              <div class="hl-icon icon-gold">🏆</div>
+              <div class="hl-badge">100% Private</div>
             </div>
-            <h3 class="ach-title">Client-Side Architecture</h3>
-            <p class="ach-desc font-mono">Pioneered zero-server SOC Log parsing and APK leak scanners running 100% in browser memory.</p>
-            <div class="ach-date font-mono">2026</div>
+            <h3 class="hl-title">Zero-Server Client Tools</h3>
+            <p class="hl-desc">Engineered fully in-browser threat analyzers and APK scanners where zero data ever leaves the user's local machine.</p>
+            <span class="hl-year">2026</span>
           </div>
 
-          <div class="achievement-card tilt-card">
-            <div class="ach-head">
-              <div class="ach-icon cyan-icon">⚡</div>
-              <div class="ach-metric font-mono">
-                <span class="metric-key">STREAK</span>
-                <span class="metric-val text-cyan">45+ Days</span>
-              </div>
+          <div class="smooth-card highlight-card tilt-card">
+            <div class="hl-header">
+              <div class="hl-icon icon-cyan">⚡</div>
+              <div class="hl-badge">Unbroken</div>
             </div>
-            <h3 class="ach-title">Consistent Code Delivery</h3>
-            <p class="ach-desc font-mono">Daily git commits across offensive security research, AI systems, and reverse engineering tools.</p>
-            <div class="ach-date font-mono">2026</div>
+            <h3 class="hl-title">45+ Day GitHub Streak</h3>
+            <p class="hl-desc">Consistent daily coding across software architecture, bug hunting scripts, and open-source packages.</p>
+            <span class="hl-year">2026</span>
           </div>
 
-          <div class="achievement-card tilt-card">
-            <div class="ach-head">
-              <div class="ach-icon gold-icon">🎯</div>
-              <div class="ach-metric font-mono">
-                <span class="metric-key">BUGS</span>
-                <span class="metric-val text-yellow">Triage T1</span>
-              </div>
+          <div class="smooth-card highlight-card tilt-card">
+            <div class="hl-header">
+              <div class="hl-icon icon-purple">🎯</div>
+              <div class="hl-badge">Bug Bounty</div>
             </div>
-            <h3 class="ach-title">Mobile Bug Bounty Audit</h3>
-            <p class="ach-desc font-mono">Uncovered multiple hardcoded keys, misconfigured Firebase real-time DBs, and vulnerable activities.</p>
-            <div class="ach-date font-mono">2025</div>
+            <h3 class="hl-title">Mobile Vulnerability Audits</h3>
+            <p class="hl-desc">Discovered and documented real-world Android misconfigurations, unprotected endpoints, and hardcoded secrets.</p>
+            <span class="hl-year">2025</span>
           </div>
 
-          <div class="achievement-card tilt-card">
-            <div class="ach-head">
-              <div class="ach-icon purple-icon">🚀</div>
-              <div class="ach-metric font-mono">
-                <span class="metric-key">COMMITS</span>
-                <span class="metric-val text-white">500+</span>
-              </div>
+          <div class="smooth-card highlight-card tilt-card">
+            <div class="hl-header">
+              <div class="hl-icon icon-green">📦</div>
+              <div class="hl-badge">Community</div>
             </div>
-            <h3 class="ach-title">Open-Source Proponent</h3>
-            <p class="ach-desc font-mono">Shipped 15+ repositories on GitHub with clean documentation, live demonstrations, and MIT licenses.</p>
-            <div class="ach-date font-mono">2026</div>
+            <h3 class="hl-title">500+ Open Source Commits</h3>
+            <p class="hl-desc">Shipped more than 15 active GitHub repositories with clean documentation and practical utility for builders.</p>
+            <span class="hl-year">2026</span>
           </div>
 
         </div>
+
       </div>
     </section>
 
-    <!-- ═══════════════════════════════════ SECTION DIVIDER 05 ═══════════════════════════════════ -->
-    <div class="section-divider-wrap" data-reveal>
-      <div class="divider-loc"><span>SYS.LOC // </span><span class="text-yellow">SEC_05</span></div>
-      <div class="divider-line left-track"><span class="track-cap">◆</span><div class="track-bar"></div></div>
-      <div class="divider-pill">
-        <span class="pill-deco">//</span>
-        <span class="pill-label">INTERACTIVE_TERMINAL</span>
-        <span class="pill-deco">//</span>
+    <!-- ─── SECTION DIVIDER 05 ─── -->
+    <div class="smooth-divider">
+      <div class="divider-track"></div>
+      <div class="divider-chip">
+        <span class="chip-star">✦</span>
+        <span class="chip-text">Interactive Console</span>
+        <span class="chip-star">✦</span>
       </div>
-      <div class="divider-line right-track"><div class="track-bar"></div><span class="track-cap">◆</span></div>
-      <div class="divider-mem"><span>MEM.SYS // </span><span class="text-yellow">LIVE</span></div>
+      <div class="divider-track"></div>
     </div>
 
-    <!-- ═══════════════════════════════════ 3D INTERACTIVE TERMINAL ═══════════════════════════════════ -->
-    <section id="terminal-sec" class="terminal-section">
-      <div class="section-container">
+    <!-- ─── TERMINAL SECTION ─── -->
+    <section id="terminal-sec" class="content-section">
+      <div class="container">
 
-        <div class="section-header text-center" data-reveal>
-          <h2 class="section-title font-pixelify">
-            Interactive <span class="text-yellow">Console</span>
+        <div class="section-title-wrap text-center">
+          <h2 class="section-heading">
+            Interactive <span class="gold-gradient">Console</span>
           </h2>
-          <p class="section-subtitle font-mono">// Direct CLI access into RAMANEON_OS. Type 'help' to inspect command table</p>
+          <p class="section-subheading">A playful web CLI terminal. Type 'help' to see what you can explore.</p>
         </div>
 
-        <div class="terminal-window" id="terminal-box" data-reveal>
-          <div class="term-header">
-            <div class="term-dots">
-              <span class="t-dot red"></span>
-              <span class="t-dot yellow"></span>
-              <span class="t-dot green"></span>
+        <div class="smooth-terminal-box">
+          <div class="terminal-bar">
+            <div class="bar-circles">
+              <span class="c red"></span>
+              <span class="c yellow"></span>
+              <span class="c green"></span>
             </div>
-            <div class="term-title font-mono">bash — ramaneon@hyper-core: ~ (x86_64-windows)</div>
-            <div class="term-mode font-mono">VT100 :: 115200 BAUD</div>
+            <span class="bar-title">ramaneon@hyper-core:~</span>
+            <span class="bar-hint">Press Enter to run</span>
           </div>
-
-          <div class="term-body font-mono" id="term-body">
-            <div class="term-welcome">
-              <div class="tw-banner">
-██████╗  █████╗ ███╗   ███╗ █████╗ ███╗   ██╗███████╗ ██████╗ ███╗   ██╗
-██╔══██╗██╔══██╗████╗ ████║██╔══██╗████╗  ██║██╔════╝██╔═══██╗████╗  ██║
-██████╔╝███████║██╔████╔██║███████║██╔██╗ ██║█████╗  ██║   ██║██╔██╗ ██║
-██╔══██╗██╔══██║██║╚██╔╝██║██╔══██║██║╚██╗██║██╔══╝  ██║   ██║██║╚██╗██║
-██║  ██║██║  ██║██║ ╚═╝ ██║██║  ██║██║ ╚████║███████╗╚██████╔╝██║ ╚████║
-╚═╝  ╚═╝╚═╝  ╚═╝╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝╚══════╝ ╚═════╝ ╚═╝  ╚═══╝
-              </div>
-              <p>Type <span class="text-yellow">help</span> for a list of available commands.</p>
-              <p>Quick shortcuts: <span class="text-cyan">projects</span>, <span class="text-cyan">skills</span>, <span class="text-cyan">whoami</span>, <span class="text-cyan">matrix</span>, <span class="text-cyan">clear</span></p>
+          <div class="terminal-screen" id="terminal-screen">
+            <div class="terminal-intro">
+              <p>Welcome to <strong>ramaneon's</strong> interactive shell. Type <span class="text-accent">help</span> to list available commands.</p>
+              <p class="sub-intro">Try: <span class="cmd-pill">projects</span>, <span class="cmd-pill">skills</span>, <span class="cmd-pill">about</span>, <span class="cmd-pill">matrix</span>, <span class="cmd-pill">clear</span></p>
             </div>
-            <div id="term-history"></div>
-            <div class="term-prompt-row">
-              <span class="term-prompt font-mono">ramaneon@core:~$</span>
-              <input type="text" id="term-input" class="term-input font-mono" autofocus autocomplete="off" spellcheck="false" />
+            <div id="terminal-logs"></div>
+            <div class="terminal-input-line">
+              <span class="prompt-symbol">guest@ramaneon:~$</span>
+              <input type="text" id="terminal-input" class="cli-input" placeholder="Type a command..." autocomplete="off" spellcheck="false" />
             </div>
           </div>
         </div>
@@ -1048,70 +937,101 @@
       </div>
     </section>
 
-    <!-- ═══════════════════════════════════ SECTION DIVIDER 06 ═══════════════════════════════════ -->
-    <div class="section-divider-wrap" data-reveal>
-      <div class="divider-loc"><span>SYS.LOC // </span><span class="text-yellow">SEC_06</span></div>
-      <div class="divider-line left-track"><span class="track-cap">◆</span><div class="track-bar"></div></div>
-      <div class="divider-pill">
-        <span class="pill-deco">//</span>
-        <span class="pill-label">TRANSMIT</span>
-        <span class="pill-deco">//</span>
+    <!-- ─── SECTION DIVIDER 06 ─── -->
+    <div class="smooth-divider">
+      <div class="divider-track"></div>
+      <div class="divider-chip">
+        <span class="chip-star">✦</span>
+        <span class="chip-text">Get in Touch</span>
+        <span class="chip-star">✦</span>
       </div>
-      <div class="divider-line right-track"><div class="track-bar"></div><span class="track-cap">◆</span></div>
-      <div class="divider-mem"><span>SIGNAL // </span><span class="text-yellow">ONLINE</span></div>
+      <div class="divider-track"></div>
     </div>
 
-    <!-- ═══════════════════════════════════ CONTACT / TRANSMISSION ═══════════════════════════════════ -->
-    <section id="contact" class="contact-section">
-      <div class="section-container">
-        
-        <div class="section-header text-center" data-reveal>
-          <h2 class="section-title font-pixelify">
-            Open <span class="text-yellow">Channel</span>
+    <!-- ─── CONTACT SECTION ─── -->
+    <section id="contact" class="content-section">
+      <div class="container">
+
+        <div class="section-title-wrap text-center">
+          <h2 class="section-heading">
+            Let's Build <span class="gold-gradient">Together</span>
           </h2>
-          <p class="section-subtitle font-mono">// Ready for collaborations, security evaluations &amp; high-voltage engineering</p>
+          <p class="section-subheading">Have an interesting project or challenge? My inbox is always open.</p>
         </div>
 
-        <div class="contact-card tilt-card" data-reveal>
-          <div class="cc-inner">
-            <div class="cc-status-row font-mono">
-              <span class="dot-green pulse"></span>
-              <span>COMMUNICATION FREQUENCY :: SECURE / ENCRYPTED</span>
+        <div class="smooth-card contact-box">
+          <div class="contact-header">
+            <div class="status-indicator-badge">
+              <span class="status-pulse"></span>
+              <span>Available for collaborations &amp; consulting</span>
             </div>
-
-            <h3 class="cc-headline font-pixelify">LET'S BUILD SOMETHING RELENTLESS.</h3>
-            <p class="cc-text">
-              Whether you need to architect client-side tools, inspect Android binaries, design autonomous AI orchestration, or collaborate on open-source defense software.
+            <h3 class="contact-title">Let's create something extraordinary.</h3>
+            <p class="contact-desc">
+              Whether you need to architect client-side security tools, audit mobile binaries, build high-speed interactive web apps, or discuss autonomous AI agent design — feel free to reach out anytime!
             </p>
+          </div>
 
-            <!-- Social Links Grid -->
-            <div class="social-channels-grid font-mono">
-              <a href="https://github.com/ramaneon" target="_blank" rel="noopener" class="channel-btn" data-cursor="GITHUB">
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
-                <span>GitHub // @ramaneon</span>
-              </a>
-              <a href="https://tryhackme.com/p/ramaneon" target="_blank" rel="noopener" class="channel-btn" data-cursor="THM">
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" style="color:#22c55e;"><path d="M10.705 0C7.54 0 4.902 2.285 4.374 5.297A4.503 4.503 0 0 0 0 9.75a4.5 4.5 0 0 0 4.5 4.5h6.205V0Zm2.59 9.75v4.5H19.5a4.5 4.5 0 0 0 4.5-4.5 4.503 4.503 0 0 0-4.374-4.453C19.098 2.285 16.46 0 13.295 0v9.75ZM10.5 15.75H4.5a6 6 0 0 0 6 6v-6Zm3 0v6a6 6 0 0 0 6-6h-6Z"/></svg>
-                <span>TryHackMe // ramaneon</span>
-              </a>
-              <a href="https://www.youtube.com/@Techivibe" target="_blank" rel="noopener" class="channel-btn" data-cursor="YOUTUBE">
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" style="color:#ef4444;"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
-                <span>YouTube // @Techivibe</span>
-              </a>
-              <a href="https://www.linkedin.com/in/raman-kumar-036320395/" target="_blank" rel="noopener" class="channel-btn" data-cursor="LINKEDIN">
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" style="color:#38bdf8;"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
-                <span>LinkedIn // Raman Kumar</span>
-              </a>
-              <a href="https://www.instagram.com/techivibe/" target="_blank" rel="noopener" class="channel-btn" data-cursor="INSTAGRAM">
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" style="color:#f43f5e;"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
-                <span>Instagram // @techivibe</span>
-              </a>
-              <button class="channel-btn" id="copy-email-btn" data-cursor="COPY">
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                <span id="copy-email-label">Copy Direct Transmission [Email]</span>
-              </button>
-            </div>
+          <div class="contact-links-grid">
+            <a href="https://github.com/ramaneon" target="_blank" rel="noopener" class="contact-channel" data-cursor="GitHub">
+              <div class="channel-icon">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
+              </div>
+              <div class="channel-info">
+                <span class="channel-label">GitHub</span>
+                <span class="channel-val">@ramaneon</span>
+              </div>
+            </a>
 
+            <a href="https://tryhackme.com/p/ramaneon" target="_blank" rel="noopener" class="contact-channel" data-cursor="TryHackMe">
+              <div class="channel-icon" style="color: #22c55e;">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M10.705 0C7.54 0 4.902 2.285 4.374 5.297A4.503 4.503 0 0 0 0 9.75a4.5 4.5 0 0 0 4.5 4.5h6.205V0Zm2.59 9.75v4.5H19.5a4.5 4.5 0 0 0 4.5-4.5 4.503 4.503 0 0 0-4.374-4.453C19.098 2.285 16.46 0 13.295 0v9.75ZM10.5 15.75H4.5a6 6 0 0 0 6 6v-6Zm3 0v6a6 6 0 0 0 6-6h-6Z"/></svg>
+              </div>
+              <div class="channel-info">
+                <span class="channel-label">TryHackMe</span>
+                <span class="channel-val">ramaneon</span>
+              </div>
+            </a>
+
+            <a href="https://www.youtube.com/@Techivibe" target="_blank" rel="noopener" class="contact-channel" data-cursor="YouTube">
+              <div class="channel-icon" style="color: #ef4444;">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+              </div>
+              <div class="channel-info">
+                <span class="channel-label">YouTube</span>
+                <span class="channel-val">@Techivibe</span>
+              </div>
+            </a>
+
+            <a href="https://www.linkedin.com/in/raman-kumar-036320395/" target="_blank" rel="noopener" class="contact-channel" data-cursor="LinkedIn">
+              <div class="channel-icon" style="color: #0284c7;">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+              </div>
+              <div class="channel-info">
+                <span class="channel-label">LinkedIn</span>
+                <span class="channel-val">Raman Kumar</span>
+              </div>
+            </a>
+
+            <a href="https://www.instagram.com/techivibe/" target="_blank" rel="noopener" class="contact-channel" data-cursor="Instagram">
+              <div class="channel-icon" style="color: #e11d48;">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+              </div>
+              <div class="channel-info">
+                <span class="channel-label">Instagram</span>
+                <span class="channel-val">@techivibe</span>
+              </div>
+            </a>
+
+            <!-- Copy Email Button -->
+            <button class="contact-channel copy-email-btn" id="copy-email-btn" data-cursor="Copy Email">
+              <div class="channel-icon" style="color: #fbbf24;">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+              </div>
+              <div class="channel-info">
+                <span class="channel-label">Direct Email</span>
+                <span class="channel-val" id="copy-email-text">Click to copy address</span>
+              </div>
+            </button>
           </div>
         </div>
 
@@ -1121,21 +1041,22 @@
   </main>
 
   <!-- ═══════════════════════════════════ FOOTER ═══════════════════════════════════ -->
-  <footer class="hud-footer">
-    <div class="section-container footer-flex">
-      <div class="footer-left font-mono">
-        <span class="text-yellow font-bold">RAMANEON</span> // SYSTEM ARCHITECTURE v4.2
+  <footer class="site-footer">
+    <div class="container footer-content">
+      <div class="footer-brand">
+        <span class="brand-text">ramaneon<span class="dot-accent">.</span></span>
+        <span class="brand-caption">Crafted with care &amp; precision</span>
       </div>
-      <div class="footer-center font-mono">
-        © 2026 RAMAN KUMAR · JUST AN ENGINEER WHO CAN DO ANYTHING.
+      <div class="footer-center">
+        © 2026 Raman Kumar · Just an engineer who can do anything.
       </div>
-      <div class="footer-right font-mono">
-        <span class="dot-green"></span> ALL CIRCUITS LIVE
+      <div class="footer-status">
+        <span class="status-pulse"></span> Open for work
       </div>
     </div>
   </footer>
 
-  <!-- CDNs: Three.js for 3D Cyber Core + GSAP -->
+  <!-- Three.js + GSAP -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
