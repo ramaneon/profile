@@ -1,799 +1,549 @@
 /**
- * main.js — Raman Kumar · ramaneon
+ * main.js — RAMANEON Cyberpunk & Gamer HUD Portfolio
  * ─────────────────────────────────────────────────────────────
- * FEATURES (all preserved + upgraded):
- *  ✓ Lenis ultra-smooth scroll (144hz)
- *  ✓ Two-ring lerp cursor with label
- *  ✓ Three.js WebGL particle field + ring geometry
- *  ✓ Scroll progress bar
- *  ✓ Nav sticky + mobile burger
- *  ✓ Hero entrance sequence (badge, name clip, role, tagline, CTAs, meta, scroll cue)
- *  ✓ Word-by-word name reveal
- *  ✓ Role ticker cycling
- *  ✓ GSAP ScrollTrigger section reveals
- *  ✓ IntersectionObserver g-reveal triggers
- *  ✓ 3D tilt cards (bento + plat rows)
- *  ✓ Magnetic buttons (lerp elastic)
- *  ✓ Avatar 3D mouse parallax
- *  ✓ Terminal typer
- *  ✓ Count-up numbers
- *  ✓ Orb + hero text scroll parallax
- *  ✓ Marquee speed bump on scroll
+ * FEATURES:
+ *  ✓ Three.js 3D WebGL cyber core (wireframe icosahedron + particle constellation)
+ *  ✓ Dynamic cursor with hover labels & smooth lerp
+ *  ✓ Web Audio API synthesized cyberpunk audio SFX
+ *  ✓ Typewriter / role cycler
+ *  ✓ 3D tilt cards with specular reflections
+ *  ✓ Interactive CLI Terminal with custom commands & matrix effect
+ *  ✓ Project filter tabs (Security, AI, Tools)
+ *  ✓ Scroll progress tracker
+ *  ✓ Mobile navigation drawer
  */
 
 'use strict';
 
-/* ════════════════════════════════════════════════════════════════
-   DEVICE DETECTION — one source of truth
-   ════════════════════════════════════════════════════════════════ */
-const IS_TOUCH  = window.matchMedia('(pointer: coarse)').matches;
-const IS_MOBILE = window.innerWidth < 768 || IS_TOUCH;
-const IS_LOW_END = IS_MOBILE && navigator.hardwareConcurrency <= 4;
-
-/* ════════════════════════════════════════════════════════════════
-   LERP HELPER
-   ════════════════════════════════════════════════════════════════ */
+/* ─── GLOBAL UTILITIES ───────────────────────────────────────── */
 const lerp = (a, b, t) => a + (b - a) * t;
+const isTouch = window.matchMedia('(pointer: coarse)').matches;
 
-/* ════════════════════════════════════════════════════════════════
-   1. LENIS SMOOTH SCROLL
-   ════════════════════════════════════════════════════════════════ */
-let lenis;
+/* ─── WEB AUDIO API CYBER SFX ────────────────────────────────── */
+let audioCtx = null;
+let sfxEnabled = false;
 
-function initLenis() {
-  // Mobile: native scroll is GPU-accelerated — Lenis adds overhead, skip it
-  if (!window.Lenis || IS_MOBILE) return;
-
-  lenis = new Lenis({
-    duration:   1.3,
-    easing:     t => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-    direction:  'vertical',
-    gestureDirection: 'vertical',
-    smooth:     true,
-    smoothTouch: false,
-    touchMultiplier: 2,
-  });
-
-  // Integrate with GSAP ScrollTrigger
-  if (window.ScrollTrigger) {
-    lenis.on('scroll', ScrollTrigger.update);
-    gsap.ticker.add(time => lenis.raf(time * 1000));
-    gsap.ticker.lagSmoothing(0);
-  } else {
-    // fallback RAF loop
-    function lenisLoop(time) {
-      lenis.raf(time);
-      requestAnimationFrame(lenisLoop);
-    }
-    requestAnimationFrame(lenisLoop);
+function initAudio() {
+  if (!audioCtx) {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (AudioContext) audioCtx = new AudioContext();
   }
+  if (audioCtx && audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+}
 
-  // Wire all anchor <a href="#..."> through Lenis
-  document.querySelectorAll('a[href^="#"]').forEach(a => {
-    a.addEventListener('click', e => {
-      const target = document.querySelector(a.getAttribute('href'));
-      if (!target) return;
-      e.preventDefault();
-      lenis.scrollTo(target, { offset: -62, duration: 1.4 });
-      // Close mobile menu
-      document.getElementById('nav-mobile')?.classList.remove('open');
-      document.getElementById('nav-burger')?.classList.remove('open');
-    });
+function playCyberBeep(freq = 880, duration = 0.08, type = 'sine') {
+  if (!sfxEnabled || !audioCtx) return;
+  try {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(freq * 1.5, audioCtx.currentTime + duration);
+
+    gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    osc.start();
+    osc.stop(audioCtx.currentTime + duration);
+  } catch (e) {
+    // audio fallback silent
+  }
+}
+
+// SFX Toggle Handler
+const sfxToggleBtn = document.getElementById('sfx-toggle');
+if (sfxToggleBtn) {
+  sfxToggleBtn.addEventListener('click', () => {
+    initAudio();
+    sfxEnabled = !sfxEnabled;
+    sfxToggleBtn.style.color = sfxEnabled ? '#facc15' : '';
+    sfxToggleBtn.style.borderColor = sfxEnabled ? 'rgba(250, 204, 21, 0.4)' : '';
+    if (sfxEnabled) playCyberBeep(1200, 0.15, 'triangle');
   });
 }
 
-/* ════════════════════════════════════════════════════════════════
-   2. PREMIUM TWO-RING LERP CURSOR  (GPU-composited — zero layout cost)
-   ════════════════════════════════════════════════════════════════ */
-
-// Shared cursor state — read by the master RAF loop
-const _cur = { mx: -200, my: -200, ox: -200, oy: -200, lx: -200, ly: -200, active: false };
-
-function initCursor() {
-  const dot   = document.getElementById('cur-dot');
-  const outer = document.getElementById('cur-outer');
-  const label = document.getElementById('cur-label');
-  if (!dot || !matchMedia('(pointer:fine)').matches) return;
-
-  _cur.active = true;
-  _cur.mx = -200; _cur.my = -200;
-  _cur.ox = -200; _cur.oy = -200;
-  _cur.lx = -200; _cur.ly = -200;
-
-  // Store raw coords only — NO DOM write here
-  document.addEventListener('mousemove', e => {
-    _cur.mx = e.clientX;
-    _cur.my = e.clientY;
-  }, { passive: true });
-
-  // DOM writes happen in master RAF (see bottom of file)
-  _cur.dot   = dot;
-  _cur.outer = outer;
-  _cur.label = label;
-
-  // Hover: expand + label
-  document.querySelectorAll('[data-cursor-label]').forEach(el => {
-    el.addEventListener('mouseenter', () => {
-      label.textContent = el.dataset.cursorLabel;
-      document.body.classList.add('cur-hover');
-    });
-    el.addEventListener('mouseleave', () => {
-      document.body.classList.remove('cur-hover');
-      label.textContent = '';
-    });
+// Trigger sound on any interactable elements if enabled
+document.querySelectorAll('a, button, .tilt-card').forEach(el => {
+  el.addEventListener('mouseenter', () => {
+    if (sfxEnabled) playCyberBeep(950, 0.05, 'sine');
   });
-
-  // Generic interactive expand
-  document.querySelectorAll('a:not([data-cursor-label]), button:not([data-cursor-label]), .tilt-el').forEach(el => {
-    el.addEventListener('mouseenter', () => document.body.classList.add('cur-hover'));
-    el.addEventListener('mouseleave', () => document.body.classList.remove('cur-hover'));
+  el.addEventListener('click', () => {
+    initAudio();
+    if (sfxEnabled) playCyberBeep(1400, 0.08, 'triangle');
   });
+});
 
-  // Visibility
-  document.addEventListener('mouseleave', () => {
-    dot.style.opacity   = '0';
-    outer.style.opacity = '0';
-  });
-  document.addEventListener('mouseenter', () => {
-    dot.style.opacity   = '1';
-    outer.style.opacity = '1';
-  });
-}
-
-/* ════════════════════════════════════════════════════════════════
-   3. THREE.JS — WEBGL PARTICLE FIELD
-   ════════════════════════════════════════════════════════════════ */
-function initWebGL() {
-  const canvas = document.getElementById('hero-canvas');
+/* ─── THREE.JS 3D WEBGL INTERACTIVE CANVAS ───────────────────── */
+function initThreeWebGL() {
+  const canvas = document.getElementById('bg-webgl-canvas');
   if (!canvas || !window.THREE) return;
-  // Skip WebGL entirely on very low-end mobile — saves ~60ms paint + GPU pressure
-  if (IS_LOW_END) { canvas.style.display = 'none'; return; }
 
-  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: false });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+  camera.position.z = 35;
+
+  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
   renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-  const scene  = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 1000);
-  camera.position.z = 6;
+  // 1. Central 3D Cyber Wireframe Icosahedron
+  const icoGeo = new THREE.IcosahedronGeometry(9, 1);
+  const icoMat = new THREE.MeshBasicMaterial({
+    color: 0xfacc15,
+    wireframe: true,
+    transparent: true,
+    opacity: 0.28,
+  });
+  const cyberIco = new THREE.Mesh(icoGeo, icoMat);
+  scene.add(cyberIco);
 
-  /* Particle cloud */
-  const COUNT = IS_MOBILE ? 300 : (window.innerWidth < 1200 ? 900 : 1600);
-  const pos   = new Float32Array(COUNT * 3);
-  const alpha = new Float32Array(COUNT);
-  const speed = new Float32Array(COUNT);
+  // Inner Core Glowing Mesh
+  const coreGeo = new THREE.OctahedronGeometry(4.5, 0);
+  const coreMat = new THREE.MeshBasicMaterial({
+    color: 0x00f0ff,
+    wireframe: true,
+    transparent: true,
+    opacity: 0.45,
+  });
+  const cyberCore = new THREE.Mesh(coreGeo, coreMat);
+  scene.add(cyberCore);
 
-  for (let i = 0; i < COUNT; i++) {
-    pos[i*3]   = (Math.random() - 0.5) * 24;
-    pos[i*3+1] = (Math.random() - 0.5) * 18;
-    pos[i*3+2] = (Math.random() - 0.5) * 12;
-    alpha[i]   = Math.random();
-    speed[i]   = Math.random() * 0.5 + 0.2;
+  // 2. Surrounding Cyber Orbital Ring
+  const torusGeo = new THREE.TorusGeometry(16, 0.08, 16, 100);
+  const torusMat = new THREE.MeshBasicMaterial({
+    color: 0xfacc15,
+    transparent: true,
+    opacity: 0.22,
+  });
+  const torusRing = new THREE.Mesh(torusGeo, torusMat);
+  torusRing.rotation.x = Math.PI / 3;
+  scene.add(torusRing);
+
+  // 3. Cyber Particles Nebula
+  const particleCount = 900;
+  const particleGeo = new THREE.BufferGeometry();
+  const positions = new Float32Array(particleCount * 3);
+  const colors = new Float32Array(particleCount * 3);
+
+  const colorYellow = new THREE.Color(0xfacc15);
+  const colorCyan = new THREE.Color(0x00f0ff);
+  const colorWhite = new THREE.Color(0xffffff);
+
+  for (let i = 0; i < particleCount * 3; i += 3) {
+    positions[i] = (Math.random() - 0.5) * 90;
+    positions[i + 1] = (Math.random() - 0.5) * 90;
+    positions[i + 2] = (Math.random() - 0.5) * 70;
+
+    const r = Math.random();
+    const c = r > 0.6 ? colorYellow : r > 0.2 ? colorCyan : colorWhite;
+    colors[i] = c.r;
+    colors[i + 1] = c.g;
+    colors[i + 2] = c.b;
   }
 
-  const geo = new THREE.BufferGeometry();
-  geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-  geo.setAttribute('alpha',    new THREE.BufferAttribute(alpha, 1));
-  geo.setAttribute('speed',    new THREE.BufferAttribute(speed, 1));
+  particleGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  particleGeo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
-  const mat = new THREE.ShaderMaterial({
-    transparent: true, depthWrite: false,
-    uniforms: {
-      uTime:  { value: 0 },
-      uColor: { value: new THREE.Color(0xa78bfa) },
-    },
-    vertexShader: `
-      attribute float alpha; attribute float speed;
-      varying float vA;
-      uniform float uTime;
-      void main() {
-        vA = alpha;
-        vec3 p = position;
-        p.y += sin(uTime * speed * 0.28 + position.x * 0.4) * 0.14;
-        p.x += cos(uTime * speed * 0.18 + position.z * 0.3) * 0.09;
-        vec4 mv = modelViewMatrix * vec4(p, 1.0);
-        gl_PointSize = (1.6 + alpha * 0.8) * (260.0 / -mv.z);
-        gl_Position  = projectionMatrix * mv;
-      }
-    `,
-    fragmentShader: `
-      varying float vA;
-      uniform vec3 uColor;
-      void main() {
-        float d = length(gl_PointCoord - 0.5);
-        if(d > 0.5) discard;
-        gl_FragColor = vec4(uColor, smoothstep(0.5, 0.0, d) * vA * 0.5);
-      }
-    `,
+  const particleMat = new THREE.PointsMaterial({
+    size: 0.5,
+    vertexColors: true,
+    transparent: true,
+    opacity: 0.65,
   });
 
-  const particles = new THREE.Points(geo, mat);
-  scene.add(particles);
+  const particleSystem = new THREE.Points(particleGeo, particleMat);
+  scene.add(particleSystem);
 
-  /* Thin accent rings */
-  const makeRing = (r, col, op, rx, ry, rz) => {
-    const m = new THREE.Mesh(
-      new THREE.TorusGeometry(r, 0.005, 16, 120),
-      new THREE.MeshBasicMaterial({ color: col, transparent: true, opacity: op })
-    );
-    m.rotation.set(rx, ry, rz);
-    scene.add(m);
-    return m;
-  };
-  const ring1 = makeRing(3.4, 0xa78bfa, 0.12, Math.PI/3,    0,          0);
-  const ring2 = makeRing(5.0, 0x60a5fa, 0.06, -Math.PI/4,  Math.PI/5,  0);
-  const ring3 = makeRing(2.1, 0x4ade80, 0.04,  Math.PI/2,  Math.PI/8,  0);
+  // Mouse reaction
+  let targetX = 0;
+  let targetY = 0;
+  let mouseX = 0;
+  let mouseY = 0;
 
-  /* Mouse parallax */
-  let rmx = 0, rmy = 0;
-  window.addEventListener('mousemove', e => {
-    rmx = (e.clientX / window.innerWidth  - 0.5) * 2;
-    rmy = (e.clientY / window.innerHeight - 0.5) * 2;
+  window.addEventListener('mousemove', (e) => {
+    mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
+    mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
   });
 
-  /* Resize */
+  // Render loop
+  function animate() {
+    requestAnimationFrame(animate);
+
+    targetX = lerp(targetX, mouseX, 0.05);
+    targetY = lerp(targetY, mouseY, 0.05);
+
+    cyberIco.rotation.x += 0.003;
+    cyberIco.rotation.y += 0.005;
+
+    cyberCore.rotation.x -= 0.006;
+    cyberCore.rotation.y -= 0.004;
+
+    torusRing.rotation.z += 0.002;
+    torusRing.rotation.x = Math.PI / 3 + targetY * 0.4;
+    torusRing.rotation.y = targetX * 0.4;
+
+    particleSystem.rotation.y += 0.0008;
+
+    scene.rotation.y = targetX * 0.35;
+    scene.rotation.x = -targetY * 0.25;
+
+    renderer.render(scene, camera);
+  }
+
+  animate();
+
+  // Resize handler
   window.addEventListener('resize', () => {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
   });
-
-  let cx = 0, cy = 0;
-  let t  = 0;
-
-  function glLoop() {
-    requestAnimationFrame(glLoop);
-    t += 0.004;
-    mat.uniforms.uTime.value = t;
-
-    cx = lerp(cx, rmx * 0.45, 0.03);
-    cy = lerp(cy, -rmy * 0.3, 0.03);
-    camera.position.x = cx;
-    camera.position.y = cy;
-
-    ring1.rotation.z += 0.0011;
-    ring2.rotation.z -= 0.0007;
-    ring3.rotation.y += 0.0009;
-    particles.rotation.y += 0.00018;
-
-    renderer.render(scene, camera);
-  }
-  glLoop();
 }
 
-/* ════════════════════════════════════════════════════════════════
-   4. SCROLL PROGRESS BAR
-   ════════════════════════════════════════════════════════════════ */
-function initScrollProgress() {
-  const bar = document.getElementById('scroll-prog');
-  if (!bar) return;
-  if (lenis) {
-    lenis.on('scroll', ({ scroll, limit }) => {
-      bar.style.width = (scroll / limit * 100) + '%';
+/* ─── HUD CURSOR LOGIC ───────────────────────────────────────── */
+function initCursor() {
+  if (isTouch) return;
+
+  const dot = document.getElementById('cursor-dot');
+  const ring = document.getElementById('cursor-ring');
+  const label = document.getElementById('cursor-label');
+  if (!dot || !ring || !label) return;
+
+  let mouseX = -100, mouseY = -100;
+  let ringX = -100, ringY = -100;
+
+  window.addEventListener('mousemove', (e) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+    dot.style.transform = `translate(${mouseX - 3}px, ${mouseY - 3}px)`;
+  });
+
+  function renderRing() {
+    ringX = lerp(ringX, mouseX, 0.18);
+    ringY = lerp(ringY, mouseY, 0.18);
+    ring.style.transform = `translate(${ringX - 16}px, ${ringY - 16}px)`;
+    label.style.transform = `translate(${ringX + 18}px, ${ringY + 14}px)`;
+    requestAnimationFrame(renderRing);
+  }
+  renderRing();
+
+  // Hover target data-cursor labels
+  document.querySelectorAll('[data-cursor]').forEach(item => {
+    item.addEventListener('mouseenter', () => {
+      const txt = item.getAttribute('data-cursor');
+      if (txt) {
+        label.textContent = txt;
+        label.classList.add('active');
+        ring.classList.add('active');
+      }
     });
-  } else {
-    window.addEventListener('scroll', () => {
-      const p = window.scrollY / (document.body.scrollHeight - window.innerHeight);
-      bar.style.width = Math.min(p * 100, 100) + '%';
-    }, { passive: true });
-  }
-}
-
-/* ════════════════════════════════════════════════════════════════
-   5. NAV — STICKY + MOBILE BURGER
-   ════════════════════════════════════════════════════════════════ */
-function initNav() {
-  const nav    = document.getElementById('nav');
-  const burger = document.getElementById('nav-burger');
-  const mobile = document.getElementById('nav-mobile');
-
-  const onScroll = () => nav?.classList.toggle('scrolled', window.scrollY > 50);
-  window.addEventListener('scroll', onScroll, { passive: true });
-  if (lenis) lenis.on('scroll', () => nav?.classList.toggle('scrolled', window.scrollY > 50));
-
-  burger?.addEventListener('click', () => {
-    burger.classList.toggle('open');
-    mobile?.classList.toggle('open');
+    item.addEventListener('mouseleave', () => {
+      label.classList.remove('active');
+      ring.classList.remove('active');
+    });
   });
 }
 
-/* ════════════════════════════════════════════════════════════════
-   6. HERO ENTRANCE SEQUENCE
-   ════════════════════════════════════════════════════════════════ */
-function heroEntrance() {
-  /* Badge */
-  const badge = document.querySelector('.hero-badge');
-  if (badge) {
-    setTimeout(() => {
-      badge.style.opacity   = '1';
-      badge.style.transform = 'translateY(0)';
-    }, 100);
-  }
-
-  /* Name words (clip reveal) */
-  document.querySelectorAll('.hn-w').forEach((w, i) => {
-    setTimeout(() => w.classList.add('in'), 200 + i * 140);
-  });
-
-  /* Role row */
-  const role = document.querySelector('.hero-role');
-  if (role) setTimeout(() => { role.style.opacity = '1'; role.style.transform = 'none'; }, 440);
-
-  /* Tagline */
-  const tag = document.querySelector('.hero-tagline');
-  if (tag) setTimeout(() => { tag.style.opacity = '1'; tag.style.transform = 'none'; }, 560);
-
-  /* Actions */
-  const act = document.querySelector('.hero-actions');
-  if (act) setTimeout(() => { act.style.opacity = '1'; act.style.transform = 'none'; }, 680);
-
-  /* Meta stats */
-  const meta = document.querySelector('.hero-meta');
-  if (meta) setTimeout(() => { meta.style.opacity = '1'; meta.style.transform = 'none'; }, 820);
-
-  /* Right avatar */
-  const right = document.getElementById('h-right');
-  if (right) setTimeout(() => right.classList.add('in'), 260);
-
-  /* Scroll cue */
-  const cue = document.getElementById('h-scroll-cue');
-  if (cue) setTimeout(() => cue.classList.add('in'), 1200);
-}
-
-/* ════════════════════════════════════════════════════════════════
-   7. ROLE CYCLER
-   ════════════════════════════════════════════════════════════════ */
+/* ─── HERO ROLE CYCLER ───────────────────────────────────────── */
 function initRoleCycler() {
-  const words = document.querySelectorAll('.rc-word');
-  if (!words.length) return;
-  let idx = 0;
-  words[0].classList.add('active');
+  const el = document.getElementById('cycler-text');
+  if (!el) return;
 
-  setInterval(() => {
-    words[idx].classList.remove('active');
-    idx = (idx + 1) % words.length;
-    words[idx].classList.add('active');
-  }, 2800);
+  const roles = [
+    'Security Researcher',
+    'Full-Stack Developer',
+    'APK Decompiler & Auditor',
+    'Autonomous AI Architect',
+    'Creator @Techivibe'
+  ];
+
+  let currentIdx = 0;
+  let charIdx = 0;
+  let isDeleting = false;
+  let typingSpeed = 90;
+
+  function typeTick() {
+    const currentWord = roles[currentIdx];
+
+    if (isDeleting) {
+      el.textContent = currentWord.substring(0, charIdx - 1);
+      charIdx--;
+      typingSpeed = 40;
+    } else {
+      el.textContent = currentWord.substring(0, charIdx + 1);
+      charIdx++;
+      typingSpeed = 90;
+    }
+
+    if (!isDeleting && charIdx === currentWord.length) {
+      isDeleting = true;
+      typingSpeed = 1600; // Pause at end of word
+    } else if (isDeleting && charIdx === 0) {
+      isDeleting = false;
+      currentIdx = (currentIdx + 1) % roles.length;
+      typingSpeed = 400; // Pause before typing new word
+    }
+
+    setTimeout(typeTick, typingSpeed);
+  }
+
+  typeTick();
 }
 
-/* ════════════════════════════════════════════════════════════════
-   8. SCROLL REVEALS — IntersectionObserver + GSAP ScrollTrigger
-   ════════════════════════════════════════════════════════════════ */
-function initReveal() {
-  /* Simple g-reveal elements */
-  const els = document.querySelectorAll('.g-reveal, .g-reveal-r');
-  const io  = new IntersectionObserver(entries => {
-    entries.forEach(e => {
-      if (!e.isIntersecting) return;
-      const delay = parseFloat(e.target.dataset.delay) || 0;
-      setTimeout(() => e.target.classList.add('on'), delay);
-      io.unobserve(e.target);
-    });
-  }, { threshold: 0.08, rootMargin: '0px 0px -50px 0px' });
-  els.forEach(el => io.observe(el));
+/* ─── 3D TILT EFFECT ON CARDS ────────────────────────────────── */
+function init3DTilt() {
+  if (isTouch) return;
 
-  /* GSAP-powered section heading line reveals */
+  const cards = document.querySelectorAll('.tilt-card');
+  cards.forEach(card => {
+    card.addEventListener('mousemove', (e) => {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
+
+      const rotateX = ((y - centerY) / centerY) * -7;
+      const rotateY = ((x - centerX) / centerX) * 7;
+
+      card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+    });
+
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+    });
+  });
+}
+
+/* ─── SCROLL PROGRESS TRACKER ────────────────────────────────── */
+function initScrollTracker() {
+  const tracker = document.getElementById('scroll-tracker');
+  if (!tracker) return;
+
+  window.addEventListener('scroll', () => {
+    const scrollTop = window.scrollY || document.documentElement.scrollTop;
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const percent = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+    tracker.style.width = `${percent}%`;
+  });
+}
+
+/* ─── PROJECT FILTER TABS ────────────────────────────────────── */
+function initProjectFilters() {
+  const filterBtns = document.querySelectorAll('.filter-btn');
+  const projectCards = document.querySelectorAll('.projects-grid .project-card');
+
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      filterBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      const filter = btn.getAttribute('data-filter');
+
+      projectCards.forEach(card => {
+        const cat = card.getAttribute('data-category');
+        if (filter === 'all' || cat === filter) {
+          card.style.display = 'flex';
+          card.style.opacity = '1';
+        } else {
+          card.style.display = 'none';
+          card.style.opacity = '0';
+        }
+      });
+    });
+  });
+}
+
+/* ─── INTERACTIVE BASH TERMINAL ──────────────────────────────── */
+function initTerminal() {
+  const input = document.getElementById('term-input');
+  const history = document.getElementById('term-history');
+  const body = document.getElementById('term-body');
+  if (!input || !history || !body) return;
+
+  const commands = {
+    help: `Available commands:
+  • <span class="text-yellow">projects</span>   - View highlighted open-source tools
+  • <span class="text-yellow">skills</span>     - Inspect operator abilities & ratings
+  • <span class="text-yellow">whoami</span>     - System operator bio & coordinates
+  • <span class="text-yellow">matrix</span>     - Run real-time cypher stream
+  • <span class="text-yellow">contact</span>    - Show transmission frequencies
+  • <span class="text-yellow">streak</span>     - Check current GitHub commit streak
+  • <span class="text-yellow">clear</span>      - Clean console window
+  • <span class="text-yellow">echo [msg]</span> - Print raw argument to terminal`,
+
+    projects: `[SYSTEM::REPOSITORIES]
+  1. <a href="https://github.com/ramaneon/socneon" target="_blank" class="text-yellow">socneon</a>              - 100% client-side MITRE ATT&CK SOC analyzer
+  2. <a href="https://github.com/ramaneon/apk-decompiler" target="_blank" class="text-yellow">apk-decompiler</a>       - Android bug bounty secret & Firebase scanner
+  3. <a href="https://github.com/ramaneon/jarvisV2" target="_blank" class="text-yellow">jarvisV2</a>             - Zero-API offline autonomous PC controller
+  4. <a href="https://github.com/ramaneon/drive-analyzer" target="_blank" class="text-yellow">drive-analyzer</a>       - Browser-based storage & junk visualization
+  5. <a href="https://github.com/ramaneon/routine" target="_blank" class="text-yellow">routine</a>              - Native Kotlin Android automation package`,
+
+    skills: `[OPERATOR::SKILL_MATRIX]
+  - Python / AsyncIO / Automation       : [PWR 96/100]
+  - C / C++ & Win32 APIs / Telemetry    : [PWR 92/100]
+  - JavaScript / TypeScript / Three.js   : [PWR 95/100]
+  - Android APK Security & Decompilation : [PWR 94/100]
+  - SOC Correlation & MITRE ATT&CK       : [PWR 90/100]
+  - Autonomous Agents & JARVIS Systems   : [PWR 93/100]`,
+
+    whoami: `Operator   : Raman Kumar (ramaneon)
+Class      : Full-Stack Security & System Architect
+Mission    : Engineering high-voltage software, breaking APK binaries, building neural agents.
+Handle     : @ramaneon (GitHub) | @Techivibe (YouTube)
+Status     : LEVEL 99 · ALL CIRCUITS LIVE`,
+
+    contact: `[TRANSMISSION::FREQUENCIES]
+  • GitHub    : https://github.com/ramaneon
+  • TryHackMe : https://tryhackme.com/p/ramaneon
+  • YouTube   : https://www.youtube.com/@Techivibe
+  • LinkedIn  : https://www.linkedin.com/in/raman-kumar-036320395/
+  • Instagram : https://www.instagram.com/techivibe/`,
+
+    streak: `[GIT::STREAK_TELEMETRY]
+  Current Streak : 45+ days active commits
+  Total Commits  : 500+ across security, AI & web platforms
+  Status         : UNBROKEN`,
+
+    sudo: `Permission denied: operator already possesses root privileges.`,
+  };
+
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      const raw = input.value.trim();
+      input.value = '';
+      if (!raw) return;
+
+      const args = raw.split(' ');
+      const cmd = args[0].toLowerCase();
+
+      if (cmd === 'clear') {
+        history.innerHTML = '';
+        return;
+      }
+
+      const block = document.createElement('div');
+      block.className = 'term-output-block';
+
+      let response = '';
+      if (cmd === 'matrix') {
+        response = '<span class="text-green">WAKE UP, NEO... THE MATRIX HAS YOU. 01001111 01010110 01000101 01010010 01000100 01010010 01001001 01010110 01000101</span>';
+      } else if (cmd === 'echo') {
+        response = args.slice(1).join(' ');
+      } else if (commands[cmd]) {
+        response = commands[cmd];
+      } else {
+        response = `Command not recognized: '${cmd}'. Type <span class="text-yellow">help</span> for assistance.`;
+      }
+
+      block.innerHTML = `
+        <div class="term-out-cmd">ramaneon@core:~$ ${raw}</div>
+        <div class="term-out-resp">${response}</div>
+      `;
+
+      history.appendChild(block);
+      body.scrollTop = body.scrollHeight;
+    }
+  });
+}
+
+/* ─── COPY EMAIL DIRECT TRANSMISSION ─────────────────────────── */
+function initCopyEmail() {
+  const btn = document.getElementById('copy-email-btn');
+  const label = document.getElementById('copy-email-label');
+  if (!btn || !label) return;
+
+  btn.addEventListener('click', () => {
+    const email = 'ramankumar.official@outlook.com'; // User direct contact fallback
+    navigator.clipboard.writeText(email).then(() => {
+      const orig = label.textContent;
+      label.textContent = 'COPIED TO CLIPBOARD! [✓]';
+      label.style.color = '#facc15';
+      setTimeout(() => {
+        label.textContent = orig;
+        label.style.color = '';
+      }, 2500);
+    }).catch(() => {
+      window.location.href = 'mailto:ramankumar.official@outlook.com';
+    });
+  });
+}
+
+/* ─── MOBILE DRAWER LOGIC ────────────────────────────────────── */
+function initMobileDrawer() {
+  const burger = document.getElementById('burger-btn');
+  const drawer = document.getElementById('mobile-drawer');
+  const closeBtn = document.getElementById('close-drawer-btn');
+  const bg = document.getElementById('mobile-drawer-bg');
+  const links = document.querySelectorAll('.mn-item');
+
+  function open() { drawer?.classList.add('open'); }
+  function close() { drawer?.classList.remove('open'); }
+
+  burger?.addEventListener('click', open);
+  closeBtn?.addEventListener('click', close);
+  bg?.addEventListener('click', close);
+
+  links.forEach(l => l.addEventListener('click', close));
+}
+
+/* ─── GSAP SCROLL REVEALS ────────────────────────────────────── */
+function initScrollReveals() {
   if (window.gsap && window.ScrollTrigger) {
     gsap.registerPlugin(ScrollTrigger);
 
-    // Bento cards stagger
-    gsap.from('.bento-card', {
-      scrollTrigger: { trigger: '.bento-grid', start: 'top 85%' },
-      y: 60, opacity: 0, scale: 0.96, duration: 0.7,
-      stagger: 0.1, ease: 'power3.out',
+    document.querySelectorAll('[data-reveal]').forEach(el => {
+      gsap.fromTo(el, 
+        { opacity: 0, y: 30 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.8,
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: el,
+            start: 'top 85%',
+            toggleActions: 'play none none none'
+          }
+        }
+      );
     });
-
-    // Platform rows stagger
-    gsap.from('.plat-row', {
-      scrollTrigger: { trigger: '.plat-list', start: 'top 85%' },
-      x: -40, opacity: 0, duration: 0.65,
-      stagger: 0.1, ease: 'power3.out',
-    });
-
-    // Connect links
-    gsap.from('.cl-item', {
-      scrollTrigger: { trigger: '.connect-links', start: 'top 90%' },
-      x: 30, opacity: 0, duration: 0.5,
-      stagger: 0.08, ease: 'power3.out',
-    });
-
-    // Pill flow pills
-    gsap.from('.pf-pill', {
-      scrollTrigger: { trigger: '.pill-flow', start: 'top 88%' },
-      y: 20, opacity: 0, scale: 0.88, duration: 0.4,
-      stagger: 0.05, ease: 'back.out(1.6)',
-    });
-
-    // Tags
-    gsap.from('.tag', {
-      scrollTrigger: { trigger: '.about-tags', start: 'top 90%' },
-      y: 16, opacity: 0, scale: 0.9, duration: 0.4,
-      stagger: 0.07, ease: 'back.out(1.5)',
-    });
-
-    // Refresh ScrollTrigger with Lenis
-    if (lenis) {
-      lenis.on('scroll', ScrollTrigger.update);
-    }
-  }
-}
-
-/* ════════════════════════════════════════════════════════════════
-   9. 3D TILT — desktop only (touch devices skip entirely)
-   ════════════════════════════════════════════════════════════════ */
-function initTilt() {
-  if (IS_TOUCH) return; // tilt is meaningless + janky on touch
-  document.querySelectorAll('.tilt-el').forEach(card => {
-    const MAX = 7;
-    let tx = 0, ty = 0;   // target
-    let cx = 0, cy = 0;   // current (lerped)
-    let raf = null;
-    let inside = false;
-
-    function animate() {
-      cx = lerp(cx, tx, 0.1);
-      cy = lerp(cy, ty, 0.1);
-      card.style.transform = `perspective(900px) rotateX(${cy}deg) rotateY(${cx}deg) translateZ(6px)`;
-      if (inside || Math.abs(cx) > 0.02 || Math.abs(cy) > 0.02) {
-        raf = requestAnimationFrame(animate);
-      } else {
-        card.style.transform = 'perspective(900px) rotateX(0) rotateY(0) translateZ(0)';
-        raf = null;
-      }
-    }
-
-    card.addEventListener('mouseenter', () => {
-      inside = true;
-      if (!raf) raf = requestAnimationFrame(animate);
-    });
-    card.addEventListener('mousemove', e => {
-      const r = card.getBoundingClientRect();
-      const x = (e.clientX - r.left) / r.width  - 0.5;
-      const y = (e.clientY - r.top)  / r.height - 0.5;
-      tx =  x * MAX;
-      ty = -y * MAX;
-      // Glow spotlight
-      card.style.setProperty('--gx', `${(x + 0.5) * 100}%`);
-      card.style.setProperty('--gy', `${(y + 0.5) * 100}%`);
-    });
-    card.addEventListener('mouseleave', () => {
-      inside = false;
-      tx = 0; ty = 0;
-      if (!raf) raf = requestAnimationFrame(animate);
-    });
-  });
-}
-
-/* ════════════════════════════════════════════════════════════════
-   10. MAGNETIC BUTTONS — desktop only
-   ════════════════════════════════════════════════════════════════ */
-function initMagnetic() {
-  if (IS_TOUCH) return; // magnetic pull on touch = broken UX
-  document.querySelectorAll('.magnetic').forEach(btn => {
-    const STRENGTH = 0.38;
-    let bx = 0, by = 0;   // target offset
-    let cx = 0, cy = 0;   // lerped offset
-    let raf = null;
-    let inside = false;
-
-    function animMag() {
-      cx = lerp(cx, bx, 0.1);
-      cy = lerp(cy, by, 0.1);
-      btn.style.transform = `translate(${cx}px, ${cy}px)`;
-      if (inside || Math.abs(cx) > 0.05 || Math.abs(cy) > 0.05) {
-        raf = requestAnimationFrame(animMag);
-      } else {
-        btn.style.transform = 'translate(0,0)';
-        raf = null;
-      }
-    }
-
-    btn.addEventListener('mouseenter', () => {
-      inside = true;
-      if (!raf) raf = requestAnimationFrame(animMag);
-    });
-    btn.addEventListener('mousemove', e => {
-      const r = btn.getBoundingClientRect();
-      bx = (e.clientX - r.left - r.width  / 2) * STRENGTH;
-      by = (e.clientY - r.top  - r.height / 2) * STRENGTH;
-    });
-    btn.addEventListener('mouseleave', () => {
-      inside = false;
-      bx = 0; by = 0;
-      if (!raf) raf = requestAnimationFrame(animMag);
-    });
-  });
-}
-
-/* ════════════════════════════════════════════════════════════════
-   11. AVATAR — 3D MOUSE PARALLAX  (state stored, drawn in master RAF)
-   ════════════════════════════════════════════════════════════════ */
-const _av = { tx: 0, ty: 0, cx: 0, cy: 0, el: null };
-
-function initAvatarParallax() {
-  if (IS_TOUCH) return; // no mouse on touch — skip entirely
-  const scene = document.getElementById('av-scene');
-  if (!scene) return;
-  _av.el = scene;
-
-  window.addEventListener('mousemove', e => {
-    const px = (e.clientX / window.innerWidth  - 0.5) * 2;
-    const py = (e.clientY / window.innerHeight - 0.5) * 2;
-    _av.tx =  px * 14;
-    _av.ty = -py * 10;
-  }, { passive: true });
-}
-
-/* ════════════════════════════════════════════════════════════════
-   12. TERMINAL TYPER
-   ════════════════════════════════════════════════════════════════ */
-function initTerminal() {
-  const body = document.getElementById('term-body');
-  if (!body) return;
-
-  const lines = [
-    { type: 'cmd', text: 'whoami' },
-    { type: 'out', text: 'raman_kumar  @  neon' },
-    { type: 'br' },
-    { type: 'cmd', text: 'cat about.txt' },
-    { type: 'out', text: 'Engineer · Hacker · Creator' },
-    { type: 'out', text: 'Based in India 🇮🇳' },
-    { type: 'br' },
-    { type: 'cmd', text: 'ls skills/' },
-    { type: 'out', text: 'pentesting/   ctf/   webdev/   content/', cls: 't-c' },
-    { type: 'br' },
-    { type: 'cmd', text: 'cat links.txt' },
-    { type: 'out', text: 'github.com/ramaneon', cls: 't-g' },
-    { type: 'out', text: 'tryhackme.com/p/ramaneon', cls: 't-g' },
-    { type: 'out', text: 'youtube.com/@Techivibe', cls: 't-g' },
-    { type: 'br' },
-    { type: 'cmd', text: 'cat motto.txt' },
-    { type: 'out', text: '"just an engineer who can do anything"', cls: 't-c' },
-    { type: 'cursor' },
-  ];
-
-  let li = 0;
-
-  function next() {
-    if (li >= lines.length) return;
-    const l = lines[li++];
-
-    if (l.type === 'br') {
-      body.appendChild(document.createElement('br'));
-      return setTimeout(next, 70);
-    }
-    if (l.type === 'cursor') {
-      const s = document.createElement('span');
-      s.innerHTML = '<span class="t-p">$</span> <span class="t-cur"></span>';
-      body.appendChild(s);
-      return;
-    }
-
-    const s = document.createElement('span');
-    if (l.type === 'out') {
-      s.className = 't-o' + (l.cls ? ' ' + l.cls : '');
-    }
-    if (l.type === 'cmd') {
-      const p = document.createElement('span');
-      p.className = 't-p'; p.textContent = '$ ';
-      s.appendChild(p);
-    }
-    body.appendChild(s);
-
-    typeText(l.text, l.type === 'cmd' ? 45 : 14, s, () => {
-      setTimeout(next, l.type === 'cmd' ? 230 : 90);
-    });
-  }
-
-  function typeText(text, speed, container, cb) {
-    const node = document.createTextNode('');
-    container.appendChild(node);
-    let i = 0;
-    function step() {
-      if (i < text.length) {
-        node.nodeValue += text[i++];
-        body.scrollTop = body.scrollHeight;
-        setTimeout(step, speed + Math.random() * 22);
-      } else {
-        cb?.();
-      }
-    }
-    step();
-  }
-
-  const io = new IntersectionObserver(([e]) => {
-    if (e.isIntersecting) { setTimeout(next, 400); io.disconnect(); }
-  }, { threshold: 0.35 });
-  io.observe(body);
-}
-
-/* ════════════════════════════════════════════════════════════════
-   13. COUNT UP
-   ════════════════════════════════════════════════════════════════ */
-function initCountUp() {
-  document.querySelectorAll('[data-target]').forEach(el => {
-    const target = parseInt(el.dataset.target);
-    const io = new IntersectionObserver(([e]) => {
-      if (!e.isIntersecting) return;
-      let n = 0;
-      const duration = 1400;
-      const steps    = 60;
-      const inc      = target / steps;
-      const interval = duration / steps;
-      const t = setInterval(() => {
-        n = Math.min(n + inc, target);
-        el.textContent = Math.floor(n);
-        if (n >= target) clearInterval(t);
-      }, interval);
-      io.disconnect();
-    }, { threshold: 0.6 });
-    io.observe(el);
-  });
-}
-
-/* ════════════════════════════════════════════════════════════════
-   14. SCROLL PARALLAX — orbs + hero text
-   ════════════════════════════════════════════════════════════════ */
-function initParallax() {
-  // Skip parallax on mobile — native scroll already smooth, extra transforms cause jank
-  if (IS_MOBILE) return;
-
-  const heroName = document.querySelector('.hero-name');
-  const orbs     = document.querySelectorAll('.orb');
-  const badge    = document.querySelector('.hero-badge');
-
-  const onScroll = () => {
-    const s = window.scrollY;
-    const h = window.innerHeight;
-    if (s < h) {
-      const pct = s / h;
-      if (heroName) heroName.style.transform = `translateY(${s * 0.14}px)`;
-      if (badge)    badge.style.transform    = `translateY(${s * 0.08}px)`;
-      orbs.forEach((o, i) => {
-        const sp = 0.03 + i * 0.02;
-        o.style.transform = `translateY(${s * sp}px)`;
+  } else {
+    // Fallback IntersectionObserver
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'translateY(0)';
+          observer.unobserve(entry.target);
+        }
       });
-    }
-  };
+    }, { threshold: 0.15 });
 
-  if (lenis) {
-    lenis.on('scroll', ({ scroll }) => {
-      const s = scroll;
-      const h = window.innerHeight;
-      if (s < h) {
-        const pct = s / h;
-        if (heroName) heroName.style.transform = `translateY(${s * 0.14}px)`;
-        if (badge)    badge.style.transform    = `translateY(${s * 0.08}px)`;
-        orbs.forEach((o, i) => {
-          o.style.transform = `translateY(${s * (0.03 + i * 0.02)}px)`;
-        });
-      }
+    document.querySelectorAll('[data-reveal]').forEach(el => {
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(30px)';
+      el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+      observer.observe(el);
     });
-  } else {
-    window.addEventListener('scroll', onScroll, { passive: true });
   }
 }
 
-/* ════════════════════════════════════════════════════════════════
-   15. MARQUEE — slow on scroll stop, speed up while scrolling
-   ════════════════════════════════════════════════════════════════ */
-const _mq = { tracks: [], vel: 0, lastScroll: 0 };
-
-function initMarqueeVelocity() {
-  _mq.tracks = Array.from(document.querySelectorAll('.marquee-inner'));
-  if (!_mq.tracks.length) return;
-
-  // On mobile skip velocity tweak — animation runs clean via CSS only
-  if (IS_MOBILE) return;
-
-  if (lenis) {
-    lenis.on('scroll', ({ velocity }) => { _mq.vel = velocity * 60; });
-  } else {
-    window.addEventListener('scroll', () => {
-      _mq.vel = window.scrollY - _mq.lastScroll;
-      _mq.lastScroll = window.scrollY;
-    }, { passive: true });
-  }
-  // Drawn in master RAF
-}
-
-/* ════════════════════════════════════════════════════════════════
-   16. WILL-CHANGE HINTS (only while hovering, not always)
-   ════════════════════════════════════════════════════════════════ */
-function initWillChange() {
-  document.querySelectorAll('.tilt-el, .magnetic, .btn-fill, .btn-ghost, .cl-item, .plat-row').forEach(el => {
-    el.addEventListener('mouseenter', () => { el.style.willChange = 'transform'; });
-    el.addEventListener('mouseleave', () => {
-      setTimeout(() => { el.style.willChange = 'auto'; }, 600);
-    });
-  });
-}
-
-/* ════════════════════════════════════════════════════════════════
-   17. PLATFORM ROWS — active line accent
-   ════════════════════════════════════════════════════════════════ */
-function initPlatRows() {
-  document.querySelectorAll('.plat-row').forEach(row => {
-    // The accent bar is CSS ::after — no extra JS needed,
-    // but we can add a subtle background shimmer on hover via JS class
-    row.addEventListener('mouseenter', () => row.setAttribute('data-active', '1'));
-    row.addEventListener('mouseleave', () => row.removeAttribute('data-active'));
-  });
-}
-
-/* ════════════════════════════════════════════════════════════════
-   MASTER RAF — one unified animation loop, zero per-system loops
-   ════════════════════════════════════════════════════════════════ */
-function masterLoop() {
-  // ── Cursor (GPU path: transform, no left/top) ──────────────────
-  if (_cur.active) {
-    _cur.ox = lerp(_cur.ox, _cur.mx, 0.12);
-    _cur.oy = lerp(_cur.oy, _cur.my, 0.12);
-    _cur.lx = lerp(_cur.lx, _cur.mx, 0.12);
-    _cur.ly = lerp(_cur.ly, _cur.my, 0.12);
-
-    // translate() is compositor-only — no layout, no paint
-    // -4 centers the 8px dot, -20 centers the 40px ring
-    _cur.dot.style.transform   = `translate(${_cur.mx - 4}px, ${_cur.my - 4}px)`;
-    _cur.outer.style.transform = `translate(${_cur.ox - 20}px, ${_cur.oy - 20}px)`;
-    _cur.label.style.transform = `translate(${_cur.lx + 18}px, ${_cur.ly - 26}px)`;
-  }
-
-  // ── Avatar parallax ────────────────────────────────────────────
-  if (_av.el) {
-    _av.cx = lerp(_av.cx, _av.tx, 0.06);
-    _av.cy = lerp(_av.cy, _av.ty, 0.06);
-    _av.el.style.transform = `rotateY(${_av.cx}deg) rotateX(${_av.cy}deg)`;
-  }
-
-  // ── Marquee velocity ───────────────────────────────────────────
-  if (_mq.tracks.length) {
-    _mq.vel *= 0.92;
-    const dur = Math.max(8, 22 - Math.abs(_mq.vel) * 0.05);
-    for (let i = 0; i < _mq.tracks.length; i++) {
-      _mq.tracks[i].style.animationDuration = dur + 's';
-    }
-  }
-
-  requestAnimationFrame(masterLoop);
-}
-
-/* ════════════════════════════════════════════════════════════════
-   BOOT
-   ════════════════════════════════════════════════════════════════ */
+/* ─── INITIALIZATION ON DOM READY ────────────────────────────── */
 document.addEventListener('DOMContentLoaded', () => {
-
-  /* Fade in body */
-  document.body.style.opacity    = '0';
-  document.body.style.transition = 'opacity .55s ease';
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => { document.body.style.opacity = '1'; });
-  });
-
-  /* Init order matters */
-  initLenis();        // 1. Smooth scroll first
-  initWebGL();        // 2. Three.js (heavy, start early)
-  initCursor();       // 3. Cursor
-  initScrollProgress();
-  initNav();
-  initWillChange();
-  initParallax();
-  initMarqueeVelocity();
-
-  /* Start the single master animation loop */
-  masterLoop();
-
-  /* Hero sequence after paint */
-  setTimeout(() => {
-    heroEntrance();
-    initRoleCycler();
-    initReveal();
-    initTilt();
-    initMagnetic();
-    initAvatarParallax();
-    initTerminal();
-    initCountUp();
-    initPlatRows();
-  }, 80);
-
+  initThreeWebGL();
+  initCursor();
+  initRoleCycler();
+  init3DTilt();
+  initScrollTracker();
+  initProjectFilters();
+  initTerminal();
+  initCopyEmail();
+  initMobileDrawer();
+  initScrollReveals();
 });
