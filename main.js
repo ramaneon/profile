@@ -9,9 +9,14 @@
 const lerp = (a, b, t) => a + (b - a) * t;
 const isTouch = window.matchMedia('(pointer: coarse)').matches;
 
-/* ─── WEB AUDIO API CYBER SFX (GENTLE & SOFT) ───────────────── */
+/* ─── WEB AUDIO API: CUTE RAINDROP & VIOLIN CHIME ENGINE ───── */
 let audioCtx = null;
 let sfxEnabled = false;
+
+// Pentatonic warm notes (C Major Pentatonic: C5, D5, E5, G5, A5, C6)
+const PENTATONIC_SCALE = [523.25, 587.33, 659.25, 783.99, 880.00, 1046.50];
+let lastHoverTime = 0;
+let lastNoteIdx = 0;
 
 function initAudio() {
   if (!audioCtx) {
@@ -23,29 +28,70 @@ function initAudio() {
   }
 }
 
-function playSoftBeep(freq = 640, duration = 0.06) {
+/**
+ * Plays a gentle, organic raindrop droplet sound.
+ * Uses a soft sine wave with quick pitch modulation & exponential decay.
+ */
+function playRainDroplet(freq = null) {
   if (!sfxEnabled || !audioCtx) return;
   try {
+    const now = audioCtx.currentTime;
+    const baseFreq = freq || PENTATONIC_SCALE[Math.floor(Math.random() * PENTATONIC_SCALE.length)];
+
+    // Primary Droplet Oscillator
     const osc = audioCtx.createOscillator();
+    const oscHarmonic = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
+    const filter = audioCtx.createBiquadFilter();
+
+    // Warm filter to round off harsh edges
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(baseFreq * 2.8, now);
+
     osc.type = 'sine';
-    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(freq * 1.2, audioCtx.currentTime + duration);
+    // Gentle water drop pitch flick
+    osc.frequency.setValueAtTime(baseFreq * 1.06, now);
+    osc.frequency.exponentialRampToValueAtTime(baseFreq, now + 0.03);
+    osc.frequency.exponentialRampToValueAtTime(baseFreq * 0.98, now + 0.18);
 
-    gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+    // Warm overtone for violin-like acoustic pluck resonance
+    oscHarmonic.type = 'triangle';
+    oscHarmonic.frequency.setValueAtTime(baseFreq * 2, now);
 
-    osc.connect(gain);
+    // Very soft volume envelope
+    gain.gain.setValueAtTime(0.001, now);
+    gain.gain.linearRampToValueAtTime(0.028, now + 0.015);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.22);
+
+    osc.connect(filter);
+    oscHarmonic.connect(filter);
+    filter.connect(gain);
     gain.connect(audioCtx.destination);
 
-    osc.start();
-    osc.stop(audioCtx.currentTime + duration);
+    osc.start(now);
+    oscHarmonic.start(now);
+    osc.stop(now + 0.23);
+    oscHarmonic.stop(now + 0.23);
   } catch (e) {
-    // silent fallback
+    // audio fallback
   }
 }
 
-// SFX Toggle
+/**
+ * Plays a cute, serene 3-note melodic rain arpeggio (like a music box or gentle violin pizzicato)
+ */
+function playMelodyChime() {
+  if (!sfxEnabled || !audioCtx) return;
+  // Notes: E5 (659Hz) -> G5 (784Hz) -> C6 (1046Hz)
+  const melodyNotes = [659.25, 783.99, 1046.50];
+  melodyNotes.forEach((note, idx) => {
+    setTimeout(() => {
+      playRainDroplet(note);
+    }, idx * 110);
+  });
+}
+
+// SFX Toggle with melodic confirmation
 const sfxToggleBtn = document.getElementById('sfx-toggle');
 if (sfxToggleBtn) {
   sfxToggleBtn.addEventListener('click', () => {
@@ -53,17 +99,33 @@ if (sfxToggleBtn) {
     sfxEnabled = !sfxEnabled;
     sfxToggleBtn.style.color = sfxEnabled ? '#fbbf24' : '';
     sfxToggleBtn.style.borderColor = sfxEnabled ? 'rgba(251, 191, 36, 0.4)' : '';
-    if (sfxEnabled) playSoftBeep(880, 0.08);
+    sfxToggleBtn.style.background = sfxEnabled ? 'rgba(251, 191, 36, 0.1)' : '';
+    if (sfxEnabled) {
+      playMelodyChime();
+    }
   });
 }
 
-document.querySelectorAll('a, button, .tilt-card').forEach(el => {
+// Selective & throttled sound triggers:
+// ONLY primary buttons and main nav links, with at least 850ms cooldown so it never spams
+const KEY_SOUND_TARGETS = '.primary-btn, .launch-btn, .nav-link, .pill-btn, .copy-email-btn';
+
+document.querySelectorAll(KEY_SOUND_TARGETS).forEach(el => {
   el.addEventListener('mouseenter', () => {
-    if (sfxEnabled) playSoftBeep(720, 0.04);
+    const now = Date.now();
+    // 850ms throttle so it only plays occasional, gentle droplets
+    if (now - lastHoverTime > 850) {
+      lastHoverTime = now;
+      lastNoteIdx = (lastNoteIdx + 1) % PENTATONIC_SCALE.length;
+      playRainDroplet(PENTATONIC_SCALE[lastNoteIdx]);
+    }
   });
+
   el.addEventListener('click', () => {
     initAudio();
-    if (sfxEnabled) playSoftBeep(960, 0.06);
+    if (sfxEnabled) {
+      playMelodyChime();
+    }
   });
 });
 
