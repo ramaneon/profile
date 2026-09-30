@@ -16,89 +16,161 @@ let musicSchedulerTimer = null;
 let currentChordIndex = 0;
 let nextChordTime = 0;
 let masterMusicGain = null;
+let rainSourceNode = null;
+let rainGainNode = null;
 
-// Warm Pentatonic Scale for occasional gentle droplets
+// Warm Pentatonic Scale for gentle droplet accents
 const PENTATONIC_SCALE = [523.25, 587.33, 659.25, 783.99, 880.00, 1046.50];
 let lastHoverTime = 0;
 let lastNoteIdx = 0;
 
-function initAudio() {
+/**
+ * Initializes and unlocks AudioContext reliably across all browsers
+ */
+async function ensureAudioContext() {
   if (!audioCtx) {
-    const AudioContext = window.AudioContext || window.webkitAudioContext;
-    if (AudioContext) {
-      audioCtx = new AudioContext();
-      masterMusicGain = audioCtx.createGain();
-      masterMusicGain.gain.setValueAtTime(0, audioCtx.currentTime);
-      masterMusicGain.connect(audioCtx.destination);
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextClass) return false;
+    audioCtx = new AudioContextClass();
+
+    masterMusicGain = audioCtx.createGain();
+    masterMusicGain.gain.setValueAtTime(0.85, audioCtx.currentTime);
+    masterMusicGain.connect(audioCtx.destination);
+
+    initRainAmbient();
+  }
+
+  if (audioCtx.state === 'suspended') {
+    try {
+      await audioCtx.resume();
+    } catch (err) {
+      console.warn('AudioContext resume deferred:', err);
     }
   }
-  if (audioCtx && audioCtx.state === 'suspended') {
-    audioCtx.resume();
+
+  return audioCtx && audioCtx.state === 'running';
+}
+
+/**
+ * Generates continuous soft rain texture using filtered pink noise buffer
+ */
+function initRainAmbient() {
+  if (!audioCtx || rainSourceNode) return;
+  try {
+    const bufferSize = audioCtx.sampleRate * 2;
+    const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+    const output = noiseBuffer.getChannelData(0);
+
+    let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+    for (let i = 0; i < bufferSize; i++) {
+      const white = Math.random() * 2 - 1;
+      b0 = 0.99886 * b0 + white * 0.0555179;
+      b1 = 0.99332 * b1 + white * 0.0750759;
+      b2 = 0.96900 * b2 + white * 0.1538520;
+      b3 = 0.86650 * b3 + white * 0.3104856;
+      b4 = 0.55000 * b4 + white * 0.5329522;
+      b5 = -0.7616 * b5 - white * 0.0168980;
+      output[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.04;
+      b6 = white * 0.115926;
+    }
+
+    rainSourceNode = audioCtx.createBufferSource();
+    rainSourceNode.buffer = noiseBuffer;
+    rainSourceNode.loop = true;
+
+    const rainFilter = audioCtx.createBiquadFilter();
+    rainFilter.type = 'bandpass';
+    rainFilter.frequency.setValueAtTime(850, audioCtx.currentTime);
+    rainFilter.Q.setValueAtTime(0.8, audioCtx.currentTime);
+
+    rainGainNode = audioCtx.createGain();
+    rainGainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+
+    rainSourceNode.connect(rainFilter);
+    rainFilter.connect(rainGainNode);
+    rainGainNode.connect(masterMusicGain);
+
+    rainSourceNode.start(0);
+  } catch (e) {
+    // Rain fallback
   }
 }
 
 /**
- * Romantic Chord Progressions & Melodies (Cmaj7 → G → Am7 → Fmaj7)
- * Beautiful, emotional, reminiscent of Yiruma & Studio Ghibli
+ * Romantic Chord Progressions & Melodies (Cmaj9 → Am9 → Fmaj7 → Gsus4)
+ * Emotional, rich, reminiscent of Yiruma & Joe Hisaishi
  */
 const ROMANTIC_CHORDS = [
   {
-    name: 'Cmaj7',
+    name: 'Cmaj9',
     bass: 130.81, // C3
-    arpeggio: [130.81, 196.00, 246.94, 261.63, 329.63, 392.00, 493.88, 523.25], // C3, G3, B3, C4, E4, G4, B4, C5
+    arpeggio: [130.81, 196.00, 246.94, 293.66, 329.63, 392.00, 493.88, 587.33], // C3, G3, B3, D4, E4, G4, B4, D5
     violinNote: 392.00, // G4
     violinNext: 587.33, // D5
   },
   {
-    name: 'G',
-    bass: 98.00, // G2
-    arpeggio: [98.00, 146.83, 196.00, 246.94, 293.66, 392.00, 440.00], // G2, D3, G3, B3, D4, G4, A4
-    violinNote: 587.33, // D5
-    violinNext: 523.25, // C5
-  },
-  {
-    name: 'Am7',
+    name: 'Am9',
     bass: 110.00, // A2
-    arpeggio: [110.00, 164.81, 220.00, 261.63, 329.63, 392.00, 523.25], // A2, E3, A3, C4, E4, G4, C5
+    arpeggio: [110.00, 164.81, 220.00, 246.94, 261.63, 329.63, 392.00, 440.00], // A2, E3, A3, B3, C4, E4, G4, A4
     violinNote: 523.25, // C5
     violinNext: 440.00, // A4
   },
   {
     name: 'Fmaj7',
     bass: 87.31, // F2
-    arpeggio: [87.31, 130.81, 174.61, 220.00, 261.63, 349.23, 392.00, 440.00], // F2, C3, F3, A3, C4, F4, G4, A4
+    arpeggio: [87.31, 130.81, 174.61, 220.00, 261.63, 329.63, 349.23, 440.00], // F2, C3, F3, A3, C4, E4, F4, A4
     violinNote: 440.00, // A4
+    violinNext: 392.00, // G4
+  },
+  {
+    name: 'Gsus4',
+    bass: 98.00, // G2
+    arpeggio: [98.00, 146.83, 196.00, 261.63, 293.66, 392.00, 493.88, 587.33], // G2, D3, G3, C4, D4, G4, B4, D5
+    violinNote: 587.33, // D5
     violinNext: 392.00, // G4
   }
 ];
 
 /**
- * Synthesizes a soft, warm acoustic piano note
+ * Rich Acoustic Piano Note Synthesizer
+ * Uses multi-harmonic synthesis (sine + triangle + ping) with audible gain
  */
-function playPianoNote(freq, startTime, duration = 1.4, velocity = 0.035) {
+function playPianoNote(freq, startTime, duration = 1.6, velocity = 0.28) {
   if (!audioCtx || !masterMusicGain) return;
   try {
     const oscFund = audioCtx.createOscillator();
     const oscHarm = audioCtx.createOscillator();
+    const oscPing = audioCtx.createOscillator();
     const noteGain = audioCtx.createGain();
     const noteFilter = audioCtx.createBiquadFilter();
 
-    // Warm piano lowpass filter
+    // Dynamic low-pass filter (hammer impact brightness decaying warm)
     noteFilter.type = 'lowpass';
-    noteFilter.frequency.setValueAtTime(freq * 3.2, startTime);
-    noteFilter.frequency.exponentialRampToValueAtTime(freq * 1.2, startTime + duration * 0.7);
+    noteFilter.frequency.setValueAtTime(Math.min(freq * 4.5, 4500), startTime);
+    noteFilter.frequency.exponentialRampToValueAtTime(Math.max(freq * 1.5, 280), startTime + duration * 0.8);
 
+    // 1. Fundamental warm sine
     oscFund.type = 'sine';
     oscFund.frequency.setValueAtTime(freq, startTime);
 
-    // Subtle 2nd harmonic for piano string realism
+    // 2. Harmonic body triangle (octave)
     oscHarm.type = 'triangle';
     oscHarm.frequency.setValueAtTime(freq * 2, startTime);
 
-    // Soft, realistic piano envelope: 4ms attack, natural decay
-    noteGain.gain.setValueAtTime(0.0001, startTime);
-    noteGain.gain.linearRampToValueAtTime(velocity, startTime + 0.006);
-    noteGain.gain.exponentialRampToValueAtTime(velocity * 0.4, startTime + 0.25);
+    // 3. Crisp hammer attack sparkle (3rd harmonic)
+    oscPing.type = 'sine';
+    oscPing.frequency.setValueAtTime(freq * 3, startTime);
+
+    const pingGain = audioCtx.createGain();
+    pingGain.gain.setValueAtTime(0.35, startTime);
+    pingGain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.09);
+    oscPing.connect(pingGain);
+    pingGain.connect(noteFilter);
+
+    // Natural piano ADSR envelope
+    noteGain.gain.setValueAtTime(0.001, startTime);
+    noteGain.gain.linearRampToValueAtTime(velocity, startTime + 0.005);
+    noteGain.gain.exponentialRampToValueAtTime(velocity * 0.45, startTime + 0.22);
     noteGain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
 
     oscFund.connect(noteFilter);
@@ -108,15 +180,19 @@ function playPianoNote(freq, startTime, duration = 1.4, velocity = 0.035) {
 
     oscFund.start(startTime);
     oscHarm.start(startTime);
+    oscPing.start(startTime);
+
     oscFund.stop(startTime + duration);
     oscHarm.stop(startTime + duration);
+    oscPing.stop(startTime + 0.1);
   } catch (e) {
-    // fallback
+    // ignore
   }
 }
 
 /**
- * Synthesizes a breathing, emotional violin legato voice
+ * Rich, Singing Romantic Violin / Cello Legato Voice
+ * Dual detuned oscillators with expressive vibrato and singing tone
  */
 function playViolinVoice(freq, startTime, duration = 3.6, targetFreqNext = null) {
   if (!audioCtx || !masterMusicGain) return;
@@ -128,36 +204,37 @@ function playViolinVoice(freq, startTime, duration = 3.6, targetFreqNext = null)
     const violinGain = audioCtx.createGain();
     const filter = audioCtx.createBiquadFilter();
 
-    // Soft string filter
+    // Warm resonant string filter
     filter.type = 'lowpass';
-    filter.frequency.setValueAtTime(1400, startTime);
-    filter.Q.setValueAtTime(2.5, startTime);
+    filter.frequency.setValueAtTime(1900, startTime);
+    filter.Q.setValueAtTime(2.2, startTime);
 
-    // Warm dual oscillators with slight detune
+    // Dual rich oscillators with subtle detuning
     osc1.type = 'sawtooth';
     osc1.frequency.setValueAtTime(freq, startTime);
 
     osc2.type = 'triangle';
-    osc2.frequency.setValueAtTime(freq * 1.002, startTime);
+    osc2.frequency.setValueAtTime(freq * 1.003, startTime);
 
-    // Subtle portamento glide if transition exists
+    // Portamento glide toward the next melodic phrase
     if (targetFreqNext) {
       osc1.frequency.linearRampToValueAtTime(targetFreqNext, startTime + duration);
-      osc2.frequency.linearRampToValueAtTime(targetFreqNext * 1.002, startTime + duration);
+      osc2.frequency.linearRampToValueAtTime(targetFreqNext * 1.003, startTime + duration);
     }
 
-    // 4.6Hz gentle violin vibrato LFO
+    // Expressive 4.8Hz vibrato LFO
     lfo.type = 'sine';
-    lfo.frequency.setValueAtTime(4.6, startTime);
-    lfoGain.gain.setValueAtTime(freq * 0.012, startTime); // gentle vibrato depth
+    lfo.frequency.setValueAtTime(4.8, startTime);
+    lfoGain.gain.setValueAtTime(freq * 0.016, startTime); // ~1.6% pitch vibrato
     lfo.connect(lfoGain);
     lfoGain.connect(osc1.frequency);
     lfoGain.connect(osc2.frequency);
 
-    // Violin Bowing Envelope: slow 0.8s attack, sustained singing tone, gentle release
-    violinGain.gain.setValueAtTime(0.0001, startTime);
-    violinGain.gain.linearRampToValueAtTime(0.018, startTime + 0.8);
-    violinGain.gain.setValueAtTime(0.018, startTime + duration - 0.7);
+    // Violin Bowing Envelope: expressive 0.3s swell, rich sustain, gentle release
+    const violinPeakGain = 0.22;
+    violinGain.gain.setValueAtTime(0.001, startTime);
+    violinGain.gain.linearRampToValueAtTime(violinPeakGain, startTime + 0.35);
+    violinGain.gain.setValueAtTime(violinPeakGain * 0.9, startTime + duration - 0.5);
     violinGain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
 
     osc1.connect(filter);
@@ -173,12 +250,22 @@ function playViolinVoice(freq, startTime, duration = 3.6, targetFreqNext = null)
     osc1.stop(startTime + duration);
     osc2.stop(startTime + duration);
   } catch (e) {
-    // fallback
+    // ignore
   }
 }
 
 /**
- * Synthesizes a soft organic raindrop droplet
+ * Immediate Romantic Chime on Click (Instant acoustic feedback)
+ */
+function playWelcomeChime(startTime) {
+  const notes = [261.63, 329.63, 392.00, 523.25]; // C4, E4, G4, C5
+  notes.forEach((n, i) => {
+    playPianoNote(n, startTime + i * 0.09, 1.4, 0.32);
+  });
+}
+
+/**
+ * Organic Raindrop Droplet Ping
  */
 function playRainDroplet(freq = null) {
   if (!audioCtx || !masterMusicGain) return;
@@ -191,85 +278,107 @@ function playRainDroplet(freq = null) {
     const filter = audioCtx.createBiquadFilter();
 
     filter.type = 'lowpass';
-    filter.frequency.setValueAtTime(baseFreq * 2.5, now);
+    filter.frequency.setValueAtTime(baseFreq * 2.8, now);
 
     osc.type = 'sine';
-    osc.frequency.setValueAtTime(baseFreq * 1.05, now);
+    osc.frequency.setValueAtTime(baseFreq * 1.06, now);
     osc.frequency.exponentialRampToValueAtTime(baseFreq, now + 0.03);
     osc.frequency.exponentialRampToValueAtTime(baseFreq * 0.98, now + 0.16);
 
     gain.gain.setValueAtTime(0.001, now);
-    gain.gain.linearRampToValueAtTime(0.02, now + 0.012);
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.2);
+    gain.gain.linearRampToValueAtTime(0.12, now + 0.012);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.28);
 
     osc.connect(filter);
     filter.connect(gain);
     gain.connect(masterMusicGain);
 
     osc.start(now);
-    osc.stop(now + 0.21);
+    osc.stop(now + 0.29);
   } catch (e) {
-    // fallback
+    // ignore
   }
 }
 
 /**
  * Continuous Romantic Music Scheduler Loop
- * Schedules gentle piano arpeggios and soaring violin counter-melodies
+ * Automatically schedules arpeggiated piano & soaring violin countermelodies
  */
 function scheduleRomanticTune() {
-  if (!musicPlaying || !audioCtx) return;
+  if (!musicPlaying || !audioCtx || audioCtx.state !== 'running') return;
 
   const now = audioCtx.currentTime;
-  const chordDuration = 3.8; // Duration of each emotional measure (~63 BPM)
+  const chordDuration = 3.6; // ~66 BPM emotional cadence
 
-  if (nextChordTime < now + 0.2) {
+  // Guarantee we don't fall behind or schedule in the past
+  if (nextChordTime < now) {
+    nextChordTime = now + 0.05;
+  }
+
+  if (nextChordTime < now + 0.4) {
     const chord = ROMANTIC_CHORDS[currentChordIndex];
-    const measureStart = Math.max(now + 0.05, nextChordTime);
+    const measureStart = nextChordTime;
 
-    // 1. Warm Violin / Cello Legato melody line for this measure
-    playViolinVoice(chord.violinNote, measureStart, chordDuration * 0.98, chord.violinNext);
+    // 1. Soaring Violin Legato Melody
+    playViolinVoice(chord.violinNote, measureStart, chordDuration * 0.96, chord.violinNext);
 
-    // 2. Deep Piano Bass note on beat 1
-    playPianoNote(chord.bass, measureStart, 2.8, 0.04);
+    // 2. Resonant Deep Piano Bass Note (Beat 1)
+    playPianoNote(chord.bass, measureStart, 2.6, 0.38);
 
-    // 3. Arpeggiated Piano notes flowing like rain
+    // 3. Flowing Acoustic Piano Arpeggio
     const arpCount = chord.arpeggio.length;
     chord.arpeggio.forEach((note, idx) => {
-      const noteDelay = (idx / arpCount) * (chordDuration * 0.85);
-      const noteVel = 0.018 + (idx % 2 === 0 ? 0.008 : 0.002);
-      playPianoNote(note, measureStart + noteDelay, 1.2, noteVel);
+      const noteDelay = (idx / arpCount) * (chordDuration * 0.88);
+      const noteVel = 0.22 + (idx % 2 === 0 ? 0.06 : 0.02);
+      playPianoNote(note, measureStart + noteDelay, 1.4, noteVel);
     });
 
-    // 4. Subtle occasional high piano rain harmonic
+    // 4. Subtle occasional high raindrop harmonic
     if (currentChordIndex % 2 === 0) {
       setTimeout(() => {
         if (musicPlaying) playRainDroplet(PENTATONIC_SCALE[Math.floor(Math.random() * PENTATONIC_SCALE.length)]);
-      }, 1400);
+      }, 1500);
     }
 
     currentChordIndex = (currentChordIndex + 1) % ROMANTIC_CHORDS.length;
     nextChordTime = measureStart + chordDuration;
   }
 
-  musicSchedulerTimer = setTimeout(scheduleRomanticTune, 120);
+  musicSchedulerTimer = setTimeout(scheduleRomanticTune, 100);
 }
 
 /**
  * Smoothly Starts Romantic Ambient Melody
  */
-function startRomanticMelody() {
-  initAudio();
+async function startRomanticMelody() {
+  const isRunning = await ensureAudioContext();
+  if (!isRunning) {
+    console.warn('Waiting for user gesture to activate AudioContext');
+    return;
+  }
+
   if (musicPlaying) return;
-
   musicPlaying = true;
-  nextChordTime = audioCtx.currentTime + 0.1;
-  currentChordIndex = 0;
 
-  // Silky 1.5s fade in
-  masterMusicGain.gain.cancelScheduledValues(audioCtx.currentTime);
-  masterMusicGain.gain.setValueAtTime(masterMusicGain.gain.value, audioCtx.currentTime);
-  masterMusicGain.gain.linearRampToValueAtTime(0.7, audioCtx.currentTime + 1.5);
+  const now = audioCtx.currentTime;
+
+  // Master Gain Fade-in
+  masterMusicGain.gain.cancelScheduledValues(now);
+  masterMusicGain.gain.setValueAtTime(0.001, now);
+  masterMusicGain.gain.linearRampToValueAtTime(0.85, now + 0.6);
+
+  // Soft background rain texture fade-in
+  if (rainGainNode) {
+    rainGainNode.gain.cancelScheduledValues(now);
+    rainGainNode.gain.setValueAtTime(0.001, now);
+    rainGainNode.gain.linearRampToValueAtTime(0.06, now + 1.2);
+  }
+
+  currentChordIndex = 0;
+  nextChordTime = now + 0.08;
+
+  // Play immediate sweet chime so visitor receives instant sound confirmation
+  playWelcomeChime(now + 0.02);
 
   scheduleRomanticTune();
   updateMusicUI(true);
@@ -285,10 +394,16 @@ function stopRomanticMelody() {
   clearTimeout(musicSchedulerTimer);
 
   if (masterMusicGain && audioCtx) {
-    // Silky 0.8s fade out
-    masterMusicGain.gain.cancelScheduledValues(audioCtx.currentTime);
-    masterMusicGain.gain.setValueAtTime(masterMusicGain.gain.value, audioCtx.currentTime);
-    masterMusicGain.gain.linearRampToValueAtTime(0.0001, audioCtx.currentTime + 0.8);
+    const now = audioCtx.currentTime;
+    masterMusicGain.gain.cancelScheduledValues(now);
+    masterMusicGain.gain.setValueAtTime(masterMusicGain.gain.value, now);
+    masterMusicGain.gain.linearRampToValueAtTime(0.0001, now + 0.4);
+
+    if (rainGainNode) {
+      rainGainNode.gain.cancelScheduledValues(now);
+      rainGainNode.gain.setValueAtTime(rainGainNode.gain.value, now);
+      rainGainNode.gain.linearRampToValueAtTime(0.0001, now + 0.4);
+    }
   }
 
   updateMusicUI(false);
@@ -349,7 +464,7 @@ if (heroMusicWidget) {
 }
 
 // Selective & throttled hover sounds (gentle raindrop)
-const KEY_SOUND_TARGETS = '.primary-btn, .launch-btn, .nav-link, .pill-btn, .copy-email-btn';
+const KEY_SOUND_TARGETS = '.primary-btn, .launch-btn, .nav-link, .pill-btn, .copy-email-btn, .music-pill-toggle';
 document.querySelectorAll(KEY_SOUND_TARGETS).forEach(el => {
   el.addEventListener('mouseenter', () => {
     const now = Date.now();
@@ -370,11 +485,13 @@ function handleFirstVisitorInteraction() {
     startRomanticMelody();
   }
   window.removeEventListener('click', handleFirstVisitorInteraction);
+  window.removeEventListener('touchstart', handleFirstVisitorInteraction);
   window.removeEventListener('keydown', handleFirstVisitorInteraction);
 }
 
-// Listen for first interaction to smoothly start the romantic tune
+// Listen for first interaction across the page to smoothly start the romantic tune
 window.addEventListener('click', handleFirstVisitorInteraction, { once: true });
+window.addEventListener('touchstart', handleFirstVisitorInteraction, { once: true });
 window.addEventListener('keydown', handleFirstVisitorInteraction, { once: true });
 
 /* ─── THREE.JS 3D WEBGL AMBIENT BACKGROUND ──────────────────── */
